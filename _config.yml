@@ -1,6 +1,6 @@
 # Setup
 title: 저장소
-description: 강원대학교 컴퓨터공학과 학부 과정 중 배운 것들을 정리한 블로그.
+description: 학부 과정에서 공부한 것들을 정리해 올리는 개인 블로그.
 url: https://orbit3230.github.io
 avatar: /avatar.png
 paginate: 5
@@ -29,9 +29,6 @@ exclude:
   - not-pure-poole.gemspec
 
 # Optimize Jekyl SEO Tag
-twitter:
-  username: vszhub
-  card: summary
 logo: logo.png
 social:
   name: Kim SeongHyeon
