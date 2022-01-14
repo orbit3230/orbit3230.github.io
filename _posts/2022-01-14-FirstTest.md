@@ -26,4 +26,4 @@ Markdown 문법을 좀 더 숙지한 후 JAVA 포스팅을 시작하겠습니다
 
 깃허브 링크  
   <https://github.com/orbit3230>  
-  [깃허브 링크]<https://github.com/orbit3230>
+  [깃허브 링크](https://github.com/orbit3230)
