@@ -8,8 +8,8 @@ tags:
 
 toc: true
 
-date: 2024-02-11
-last_modified_at: 2024-02-11
+date: 2024-02-12
+last_modified_at: 2024-02-12
 ---
 ## Turtle 프로그램 실습
 ### 1. 사서 고생하기
