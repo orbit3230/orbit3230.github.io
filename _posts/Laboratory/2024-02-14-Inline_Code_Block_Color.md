@@ -12,7 +12,7 @@ date: 2024-02-14
 last_modified_at: 2024-02-14
 ---
 ## 인라인 코드 블럭이 안보여!
-- 이상하게 내 블로그 jekyll theme에서는 남들처럼  
+- 이상하게 내 블로그 jekyll theme에서는  
 *인라인 코드 블럭(Inline Code Block)의 색상이 뒷 배경과 똑같아서*  
 도대체 이게 쓴건지 안 쓴건지 구분이 안되었다.  
 <br>
