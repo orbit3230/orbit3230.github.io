@@ -12,7 +12,7 @@ date: 2024-02-17
 last_modified_at: 2024-02-18
 ---
 ## Bronze
-### 1001
+### [1001][def]
 
 ```java
 import java.io.BufferedReader;
@@ -71,7 +71,7 @@ public class P_1001 {
 </div>
 </details>
 
-### 1008
+### [1008][def2]
 
 ```java
 import java.io.BufferedReader;
@@ -105,7 +105,7 @@ public class P_1008 {
 
 <br>
 
-### 2557
+### [2557][def3]
 
 ```java
 public class P_2557 {
@@ -121,7 +121,7 @@ public class P_2557 {
 
 <br>
 
-### 10869
+### [10869](https://www.acmicpc.net/problem/10869)
 
 ```java
 import java.io.BufferedReader;
@@ -159,7 +159,7 @@ public class P_10869 {
 
 <br>
 
-### 10926
+### [10926][def6]
 
 ```java
 import java.io.BufferedReader;
@@ -189,7 +189,7 @@ public class P_10926 {
 
 <br>
 
-### 10998
+### [10998][def4]
 
 ```java
 import java.io.BufferedReader;
@@ -224,7 +224,7 @@ public class P_10998 {
 <br>
 
 ## Silver
-### 1003
+### [1003][def5]
 
 ```java
 public class P_1003 {
@@ -305,3 +305,10 @@ public class P_1003 {
 
 </div>
 </details> 
+
+[def]: https://www.acmicpc.net/problem/1001
+[def2]: https://www.acmicpc.net/problem/1008
+[def3]: https://www.acmicpc.net/problem/2557
+[def4]: https://www.acmicpc.net/problem/10998
+[def5]: https://www.acmicpc.net/problem/1003
+[def6]: https://www.acmicpc.net/problem/10926
