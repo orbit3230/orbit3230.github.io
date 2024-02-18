@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] "
-excerpt: "6 bronze, 2 silver"
+title: "[데일리 백준] 18108, 10430, 2588, 11382, 10171, 10172, 1004, 2447"
+excerpt: "6 bronze, 1 silver, 1 gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -9,7 +9,7 @@ tags:
 toc: true
 
 date: 2024-02-18
-last_modified_at: 2024-02-18
+last_modified_at: 2024-02-19
 ---
 ## Bronze
 ### [18108][def]
