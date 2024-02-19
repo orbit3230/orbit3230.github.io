@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 1330, 9498, 2753, 14681, 2884, 2525, 2480, 1010, 2448"
-excerpt: "6 bronze, 1 silver, 1 gold"
+title: "[데일리 백준] 1330, 9498, 2753, 14681, 2884, 2525, 2480, 1010, 2448, 10993"
+excerpt: "6 bronze, 1 silver, 2 gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -490,6 +490,184 @@ public class P_2448 {
 </div>
 </details>
 
+### [10993][def12]
+
+```java
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+import java.util.ArrayList;
+import java.util.List;
+
+public class P_10993 {
+
+	public static void main(String[] args) throws IOException {
+		
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(System.out));
+
+		int n = Integer.parseInt(input.readLine());
+		
+		List<String> pattern = List.of("*");
+		for(int i = 2 ; i <= n ; i++) {
+			if(i % 2 == 0)
+				pattern = patternIfEven(pattern);
+			else
+				pattern = patternIfOdd(pattern);
+		}
+		
+		for(String line : pattern)
+			output.write(line + "\n");
+		
+		output.flush();
+		output.close();
+	}
+	/**
+	 * 홀수 번째 차례에서 다음 패턴을 구하는 메소드.
+	 * @param pattern 이전 패턴
+	 * @return 다음 패턴을 담은 List
+	 */
+	public static List<String> patternIfOdd(List<String> pattern) {
+		List<String> newPattern = new ArrayList<String>();
+		StringBuilder next;
+		
+		int lastLength = pattern.get(0).length();
+		int newLength = (lastLength + 1) + (lastLength + 2);
+		int height = lastLength + 2;
+		int blank = 1;
+		int fill = 0;
+		for(int i = 1 ; i <= height ; i++) {
+			next = new StringBuilder("");
+			// 처음과 마지막 처리
+			if(i == 1) {
+				for(int times = 0 ; times < newLength / 2 ; times++)
+					next.append(" ");
+				next.append("*");
+			}
+			else if(i == height) 
+				for(int times = 0 ; times < newLength ; times++)
+					next.append("*");
+			// 가운데 처리
+			else if(i < height/2 + 1) {  // 이전 패턴이 들어가지 않는 부분
+				// (1) 공백 삽입
+				for(int times = 0 ; times < (newLength - blank) / 2 ; times++)
+					next.append(" ");
+				// (2) * 하나 삽입
+				next.append("*");
+				// (3) 삼각형 내 공백과 * 추가 삽입
+				for(int times = 0 ; times < blank - 2 ; times++)
+					next.append(" ");
+				if(blank - 2 > 0) 
+					next.append("*");
+			}
+			else {  // 이전 패턴이 들어가는 부분
+				// (1) 공백 삽입
+				for(int times = 0 ; times < (newLength - blank) / 2 ; times++)
+					next.append(" ");
+				// (2) * 하나 삽입
+				next.append("*");
+				// (6) 삼각형 내 공백을 채우고, 이전 패턴 삽입, *으로 마무리
+				for(int times = 0 ; times < fill ; times++)
+					next.append(" ");
+				next.append(pattern.get(fill));
+				for(int times = 0 ; times < fill*2 ; times++)
+					next.append(" ");
+				next.append("*");
+				fill++;
+			}
+			newPattern.add(next.toString());
+			blank += 2;
+		}
+		return newPattern;
+	}
+	/**
+	 * 짝수 번째 차례에서 다음 패턴을 구하는 메소드.
+	 * 홀수 메소드와 완전히 역순이다.
+	 * @param pattern 이전 패턴
+	 * @return 다음 패턴을 담은 List
+	 */
+	public static List<String> patternIfEven(List<String> pattern) {
+		List<String> newPattern = new ArrayList<String>();
+		StringBuilder next;
+		
+		int lastLength = pattern.get(pattern.size()-1).length();
+		int newLength = (lastLength + 1) + (lastLength + 2);
+		int height = lastLength + 2;
+		int blank = 0;
+		int fill = lastLength / 2;
+		int patternIndex = 0;
+		for(int i = 1 ; i <= height ; i++) {
+			next = new StringBuilder("");
+			// 처음과 마지막 처리
+			if(i == 1)
+				for(int times = 0 ; times < newLength ; times++)
+					next.append("*");
+			else if(i == height) {
+				for(int times = 0 ; times < newLength / 2 ; times++)
+					next.append(" ");
+				next.append("*");
+			}
+			// 가운데 처리
+			else if(i <= height/2 + 1) {  // 이전 패턴이 들어가는 부분
+				// (1) 공백 삽입
+				for(int times = 0 ; times < blank ; times++)
+					next.append(" ");
+				// (2) * 하나 삽입
+				next.append("*");
+				// (6) 삼각형 내 공백을 채우고, 이전 패턴 삽입
+				for(int times = 0 ; times < fill ; times++)
+					next.append(" ");
+				next.append(pattern.get(patternIndex++));
+				for(int times = 0 ; times < fill*2 ; times++)
+					next.append(" ");
+				next.append("*");
+				fill--;
+			}
+			else {  // 이전 패턴이 들어가지 않는 부분
+				// (1) 공백 삽입
+				for(int times = 0 ; times < blank ; times++)
+					next.append(" ");
+				// (2) * 하나 삽입
+				next.append("*");
+				// (3) 삼각형 내 공백과 * 추가 삽입
+				for(int times = 0 ; times < newLength - blank * 2 - 2 ; times++)
+					next.append(" ");
+				if(newLength - blank * 2 - 2 > 0) 
+					next.append("*");
+			}
+			newPattern.add(next.toString());
+			blank++;
+		}
+		return newPattern;
+	}
+
+}
+```
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+  - 수가 증가하는 패턴을 찾는 데에 굉장히 애먹었다.  
+  다만 패턴을 찾은 후로는,  
+  해당 패턴을 이용하였을 때 문제가 직관적으로 바뀌었으며,  
+  그 즉시 한글로 문제 해결 순서를 작성하고 그것을 코드로 작성함으로서 깔끔하게 해결했다.
+
+  ![backjoon_10993][def13]
+
+  - 처음 문제를 제출했을 때  
+  `출력 형식이 잘못되었습니다` 라는 오답 메세지를 맞이하였는데,  
+  이는 정답과 매우 유사하나, 공백이나 새 줄문자 등으로 인해  
+  눈에는 보이지 않는 정답과의 차이점이 있음을 뜻하는 것임을 알게되었다.  
+  실제로 예제의 출력결과에서는 삼각형의 오른편 공백이 없었고 내 코드에는 그것(공백)을 구현해버렸기 때문에, 오류가 발생했다.  
+  빠르게 해결할 수 있었다.
+
+  - 무언가 잘못된 출력이 나왔을 때 문제가 되는 부분을 눈으로 디버깅하고 재빨리 찾아내는 능력이 상당히 좋아진 것 같다고 느낀다.
+
+</div>
+</details>
+
 [def]: https://www.acmicpc.net/problem/1330
 [def2]: https://www.acmicpc.net/problem/9498
 [def3]: https://www.acmicpc.net/problem/2753
@@ -501,3 +679,5 @@ public class P_2448 {
 [def9]: https://www.acmicpc.net/blog/view/37
 [def10]: https://www.acmicpc.net/problem/2448
 [def11]: https://i.imgur.com/wXUeCOh.png
+[def12]: https://www.acmicpc.net/problem/10993
+[def13]: https://i.imgur.com/M0JPSjM.png
