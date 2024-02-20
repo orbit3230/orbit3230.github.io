@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[데일리 백준] 1330, 9498, 2753, 14681, 2884, 2525, 2480, 1010, 2448, 10993"
-excerpt: "6 bronze, 1 silver, 2 gold"
+excerpt: "7 bronze, 1 silver, 2 gold"
 
 tags:
   - [데일리 백준, Backjoon]
