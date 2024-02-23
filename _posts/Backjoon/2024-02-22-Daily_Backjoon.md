@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] "
-excerpt: "5 bronze, 1 silver"
+title: "[데일리 백준] 10807, 10871, 10818, 2562, 10810"
+excerpt: "5 bronze, X silver"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -243,11 +243,12 @@ public class P_10810 {
 <br>
 
 ## Silver
-### [??]()
+### 오늘의 실버는 없습니다
 
 ```java
-// 수강신청때매 일찍자야됨
-// 내일 추가로 풀게요 ~
+// 내일 수강신청 때문에 일찍자러 가야해요~
+// 이전에 기준보다 많이 풀었기 때문에
+// 그걸로 때우겠습니다.
 ```
 
 [def]: https://www.acmicpc.net/problem/10807
