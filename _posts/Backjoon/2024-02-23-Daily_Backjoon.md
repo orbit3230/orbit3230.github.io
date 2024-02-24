@@ -190,7 +190,7 @@ public class P_10811 {
 
 	}
 	static void reverse(int[] baskets, int from, int to) {
-		for(int i = 0 ; i < Math.nextUp((to-from)/2) ; i++)
+		for(int i = 0 ; i < (to-from)/2.0 ; i++)
 			swap(baskets, from+i, to-i);
 	}
 	static void swap(int[] baskets, int i1, int i2) {
@@ -207,11 +207,19 @@ public class P_10811 {
 <summary>코멘트</summary>
 <div markdown="1">
 
-  - `Math.round`는 반올림 함수이다.  
+  - ~~`Math.round`는 반올림 함수이다.  
   그런데 `1/2`와 같이 `.5`로 떨어지는 애매한 소수는 부동소수점 문제 때문에  
-  반올림하여 올리고자 하였으나 제대로 안 올라갈 수가 있다. (ex. 0.4999999)
+  반올림하여 올리고자 하였으나 제대로 안 올라갈 수가 있다. (ex. 0.4999999)~~
   
-  - 그럴 땐 그냥 `Math.nextUp`이나 `Math.nextDown`으로 확실하게 오르내리자.
+  - ~~그럴 땐 그냥 `Math.nextUp`이나 `Math.nextDown`으로 확실하게 오르내리자.~~
+
+  - 아니다. 잘못 알았다.  
+  올림 함수는 `Math.ceil()`이고,  
+  내림 함수는 `Math.floor()`이다. 완전 기능이 다른 거였음.  
+
+  - 그리고 애초에 이 문제에서 그거 쓸 일 없음.  
+  - 위 `Math.nextUp()`을 썼는데 뽀록으로 맞았던 이유가,  
+  내가 실수로 정수/정수 나눗셈을 하여 1.5가 나와야 할 게 1이 나와버림. 그런데 `Math.nextUp()`으로 1.000001이 되어 운좋게 반복문이 잘 맞게 돌아간거였음.
 
 </div>
 </details>
