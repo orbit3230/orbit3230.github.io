@@ -122,46 +122,6 @@ public class P_10250 {
 ### [10809][def3]
 
 ```java
-import java.io.BufferedReader;
-import java.io.BufferedWriter;
-import java.io.IOException;
-import java.io.InputStreamReader;
-import java.io.OutputStreamWriter;
-
-public class P_10809 {
-
-	public static void main(String[] args) throws IOException {
-		
-		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
-		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(System.out));
-		
-		String s = input.readLine();
-		
-		for(char alphabet = 'a' ; alphabet <= 'z' ; alphabet++)
-			output.write(s.indexOf(alphabet) + " ");
-		
-		output.flush();
-		output.close();
-
-	}
-
-}
-```
-
-<details>
-<summary>코멘트</summary>
-<div markdown="1">
-
-- `char` + `int`타입 숫자 1 을 연산하면  
-연산 결과는 다음번째 아스키코드 문자이다.
-
-</div>
-</details>  
-
-## Silver
-### [1436][def4]
-
-```java
 // 풀지 못하여 내일로 토스하도록 하겠다.
 ```
 
