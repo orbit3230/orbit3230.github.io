@@ -122,8 +122,39 @@ public class P_10250 {
 ### [10809][def3]
 
 ```java
+import java.io.BufferedReader;
+import java.io.BufferedWriter;
+import java.io.IOException;
+import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
+
+public class P_10809 {
+
+	public static void main(String[] args) throws IOException {
+		
+		BufferedReader input = new BufferedReader(new InputStreamReader(System.in));
+		BufferedWriter output = new BufferedWriter(new OutputStreamWriter(System.out));
+		
+		String s = input.readLine();
+		
+		for(char alphabet = 'a' ; alphabet <= 'z' ; alphabet++)
+			output.write(s.indexOf(alphabet) + " ");
+		
+		output.flush();
+		output.close();
+
+	}
+
+}
+```
+
+## Silver
+### [1436][def4]
+
+```java
 // 풀지 못하여 내일로 토스하도록 하겠다.
 ```
+
 
 [def]: https://www.acmicpc.net/problem/8958
 [def2]: https://www.acmicpc.net/problem/10250
