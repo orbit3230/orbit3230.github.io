@@ -148,22 +148,13 @@ public class P_10809 {
 }
 ```
 
-<details>
-<summary>코멘트</summary>
-<div markdown="1">
-
-- `char` + `int`타입 숫자 1 을 연산하면  
-연산 결과는 다음번째 아스키코드 문자이다.
-
-</div>
-</details>  
-
 ## Silver
 ### [1436][def4]
 
 ```java
 // 풀지 못하여 내일로 토스하도록 하겠다.
 ```
+
 
 [def]: https://www.acmicpc.net/problem/8958
 [def2]: https://www.acmicpc.net/problem/10250
