@@ -149,7 +149,7 @@ public class P_15655 {
 					isAsc = Arrays.copyOf(nowArray, nowArray.length);
 					Arrays.sort(isAsc);
 					if(Arrays.equals(nowArray, isAsc))
-					printArray(nowArray);
+						printArray(nowArray);
 				}
 				else
 					permute(index+1, nowArray, nowUsed);
