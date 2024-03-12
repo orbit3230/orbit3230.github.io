@@ -11,7 +11,7 @@ toc: true
 date: 2024-03-10
 last_modified_at: 2024-03-10
 ---
-## Bronze
+## Bronze 
 ### [2609][def]
 
 ```java
