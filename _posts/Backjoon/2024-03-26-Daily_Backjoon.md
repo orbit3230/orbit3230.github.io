@@ -14,7 +14,7 @@ last_modified_at: 2024-03-26
 ## Bronze
 ### [7287][def]
 
-```java
+```c++
 #include <iostream>
 int main() {
     std::cout << "103" << std::endl;
