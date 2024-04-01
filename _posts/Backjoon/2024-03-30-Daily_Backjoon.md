@@ -14,7 +14,7 @@ last_modified_at: 2024-03-30
 ## Bronze
 ### [2420][def]
 
-```java
+```c++
 #include <iostream>
 
 int main() {
