@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[데일리 백준] 18110"
+title: "[데일리 백준] 4949"
 excerpt: "1 Silver"
 
 tags:
@@ -8,11 +8,11 @@ tags:
 
 toc: true
 
-date: 2024-04-10
-last_modified_at: 2024-04-10
+date: 2024-04-11
+last_modified_at: 2024-04-11
 ---
 ## Silver
-### [18110][def]
+### [4949][def]
 
 ```c++
 #include <stdio.h>
@@ -103,4 +103,4 @@ int main() {
 
 - 자료구조 수업 코드 재활용
 
-[def]: https://www.acmicpc.net/problem/18110
+[def]: https://www.acmicpc.net/problem/4949
