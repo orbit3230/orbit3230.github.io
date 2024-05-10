@@ -55,16 +55,4 @@ int main() {
 }
 ```
 
-<details>
-<summary>코멘트</summary>
-<div markdown="1">
-
-- 아이디어(점화식)
-
-![recurrence_relation][def2]
-
-</div>
-</details>
-
 [def]: https://www.acmicpc.net/problem/1439
-[def2]: https://i.imgur.com/WrhdMV0.png
