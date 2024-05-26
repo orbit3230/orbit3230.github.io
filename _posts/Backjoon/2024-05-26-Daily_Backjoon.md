@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[데일리 백준] 1543"
+title: "[데일리 백준] 2167"
 excerpt: "1 Silver"
 
 tags:
@@ -8,11 +8,11 @@ tags:
 
 toc: true
 
-date: 2024-05-25
-last_modified_at: 2024-05-25
+date: 2024-05-26
+last_modified_at: 2024-05-26
 ---
 ## Silver
-### [1543][def]
+### [2167][def]
 
 ```c++
 #include <iostream>
@@ -51,4 +51,4 @@ int main() {
 }
 ```
 
-[def]: https://www.acmicpc.net/problem/1543
+[def]: https://www.acmicpc.net/problem/2167
