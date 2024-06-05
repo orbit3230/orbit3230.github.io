@@ -1,16 +1,78 @@
 ---
 layout: post
-title: "[데일리 백준] 11047"
-excerpt: "1 Silver"
+title: "[데일리 백준] 28702, 30802, 11047"
+excerpt: "2 Bronze(for Solve.ac - class 2), 1 Silver"
 
 tags:
   - [데일리 백준, Backjoon]
 
 toc: true
 
-date: 2024-06-04
-last_modified_at: 2024-06-04
+date: 2024-06-05
+last_modified_at: 2024-06-05
 ---
+## Bronze
+### [28702][def2]
+
+```c++
+#include <iostream>
+using namespace std;
+
+int main() {
+    int change;
+    int i;
+    for(i = 0 ; i < 3 ; i++) {
+        string s;
+        cin >> s;
+        // 입력받은 것이 숫자인지 체크
+        if(s[0] - '0' > 0 && s[0] - '0' < 10) {
+            change = stoi(s);
+            break;  // 숫자를 발견
+        }
+    }
+    change += (3 - i);
+
+    if(change % 3 == 0 && change % 5 == 0)
+        cout << "FizzBuzz";
+    else if(change % 3 == 0)
+        cout << "Fizz";
+    else if(change % 5 == 0)
+        cout << "Buzz";
+    else
+        cout << change;
+}
+```
+
+### [30802][def3]
+
+```c++
+#include <iostream>
+#include <cmath>
+using namespace std;
+
+int main() {
+    int n;
+    cin >> n;
+    int S, M, L, XL, XXL, XXXL;
+    cin >> S >> M >> L >> XL >> XXL >> XXXL;
+    double t;
+    int p;
+    cin >> t >> p;
+
+    int t_shirt = 0;
+    t_shirt += ceil((double)S / t);
+    t_shirt += ceil((double)M / t);
+    t_shirt += ceil((double)L / t);
+    t_shirt += ceil((double)XL / t);
+    t_shirt += ceil((double)XXL / t);
+    t_shirt += ceil((double)XXXL / t);
+
+    cout << t_shirt << '\n' << n / p << " " << n % p;
+}
+```
+
+<br>
+
 ## Silver
 ### [11047][def]
 
@@ -72,3 +134,5 @@ iterator가 더 이상 유효하지 않은 데이터를 가리키게 되기 때�
 </details>
 
 [def]: https://www.acmicpc.net/problem/11047
+[def2]: https://www.acmicpc.net/problem/28702
+[def3]: https://www.acmicpc.net/problem/30802
