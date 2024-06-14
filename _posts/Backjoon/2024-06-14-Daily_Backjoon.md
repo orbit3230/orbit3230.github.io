@@ -62,6 +62,52 @@ int main() {
   - `find()` 메소드는 찾은 위치의 iterator를 반환하고, 찾지 못하였을 경우 끝을 가리키는 iterator를 반환.  
 
 </div>
-</details>
+</details>  
+
+<br>
+
+- 하지만 이분탐색 STL 메소드를 사용하면 더 빠르다. (600ms / unordered_set : 900ms)  
+
+  - 안타깝게도 직접 구현한 이분탐색 메소드는 통과에 실패했다 . . .
+
+```c++
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int t;
+    cin >> t;
+    int n;
+    int m;
+    vector<int> watches;
+    for(int i = 0 ; i < t ; i++) {
+        watches.clear();
+        cin >> n;
+        int next;
+        for(int j = 0 ; j < n ; j++) {
+            cin >> next;
+            watches.push_back(next);
+        }
+        sort(watches.begin(), watches.end());
+        
+        cin >> m;
+        for(int j = 0 ; j < m ; j++) {
+            cin >> next;
+            if(binary_search(watches.begin(), watches.end(), next)) {
+                cout << 1 << '\n';
+            }
+            else {
+                cout << 0 << '\n';
+            }
+        }
+    }
+}
+```
 
 [def]: https://www.acmicpc.net/problem/2776
