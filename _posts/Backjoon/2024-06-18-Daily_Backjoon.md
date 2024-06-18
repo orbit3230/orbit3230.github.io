@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 14940"
-excerpt: "1 Silver"
+title: "[데일리 백준] 14940, 11048"
+excerpt: "2 Silver"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -120,6 +120,65 @@ int main() {
 </div>
 </details> 
 
+
+### [11048][def4]
+
+```c++
+#include <iostream>
+#include <queue>
+using namespace std;
+
+int going(int **graph, int n, int m) {
+    int **sum = new int*[n];
+    for(int i = 0 ; i < n ; i++) {
+        sum[i] = new int[m];
+        for(int j = 0 ; j < m ; j++) {
+            sum[i][j] = -1;
+        }
+    }
+
+    queue<pair<int, int>> q;
+    int x_ = 0;
+    int y_ = 0;
+    sum[x_][y_] = graph[x_][y_];
+    q.push({x_, y_});
+    while(!q.empty()) {
+        x_ = q.front().first;
+        y_ = q.front().second;
+        q.pop();
+        if((x_ + 1 < n) && (graph[x_ + 1][y_] + sum[x_][y_] > sum[x_ + 1][y_])) {
+            sum[x_ + 1][y_] = graph[x_ + 1][y_] + sum[x_][y_];
+            q.push({x_ + 1, y_});
+        }
+        if((y_ + 1 < m) && (graph[x_][y_ + 1] + sum[x_][y_] > sum[x_][y_ + 1])) {
+            sum[x_][y_ + 1] = graph[x_][y_ + 1] + sum[x_][y_];
+            q.push({x_, y_ + 1});
+        }
+    }
+    return sum[n - 1][m - 1];
+}
+
+int main() {
+    std::ios_base::sync_with_stdio(false);
+    std::cin.tie(NULL);
+    std::cout.tie(NULL);
+
+    int n, m;
+    cin >> n >> m;
+    int **graph = new int*[n];
+    for(int i = 0 ; i < n ; i++) {
+        graph[i] = new int[m];
+        for(int j = 0 ; j < m ; j++) {
+            cin >> graph[i][j];
+        }
+    }
+
+    int candies = going(graph, n, m);
+    cout << candies << '\n';
+}
+```
+
 [def]: https://www.acmicpc.net/problem/14940
 [def2]: https://orbit3230.github.io/2024/06/17/Daily_Backjoon/
 [def3]: https://www.acmicpc.net/problem/21736
+[def4]: https://www.acmicpc.net/problem/11048
