@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[데일리 백준] 31997"
-excerpt: "1 Gold, 1 Silver"
+excerpt: "1 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
