@@ -12,7 +12,7 @@ date: 2024-07-03
 last_modified_at: 2024-07-03
 ---
 ## Gold
-### [14938]()
+### [14938][def2]
 
 ```c++
 #include <iostream>
@@ -234,3 +234,4 @@ int main() {
 ```
 
 [def]: https://www.acmicpc.net/problem/7569
+[def2]: https://www.acmicpc.net/problem/14938
