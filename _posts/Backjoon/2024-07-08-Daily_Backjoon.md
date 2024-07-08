@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 1967"
-excerpt: "1 Gold"
+title: "[데일리 백준] 1967, 1167"
+excerpt: "2 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -77,7 +77,98 @@ int main() {
 }
 ```
 
+### [1167][def2]
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int theLongest = 0;
+
+typedef struct Node Node;
+
+typedef struct Link {
+    Node* dest;
+    int distance;
+} Link;
+
+typedef struct Node {
+    vector<Link*> neighbors;
+    bool visited;
+} Node;
+
+// P1967에 자세히 설명해둠
+int dfs_search(Node* current, int distance) {
+    current->visited = true;
+    int max_distance = 0;
+    int second_max_distance = 0;
+    for(Link* link  : current->neighbors) {
+        Node* node = link->dest;
+        if(node->visited) continue;
+        int child_distance = dfs_search(node, link->distance);
+        if(child_distance > second_max_distance) {
+            if(child_distance > max_distance) {
+                second_max_distance = max_distance;
+                max_distance = child_distance;
+            }
+            else {
+                second_max_distance = child_distance;
+            }
+        }
+    }
+    if(max_distance + second_max_distance > theLongest) {
+        theLongest = max_distance + second_max_distance;
+    }
+    return max_distance + distance;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n;
+    cin >> n;
+    int parent;
+    int child;
+    int distance;
+    vector<Node> tree(n);
+    for(int i = 0 ; i < n ; i++) {
+        cin >> parent;
+        parent--;
+        while(true) {
+            cin >> child;
+            if(child == -1) break;
+            cin >> distance;
+            child--;
+            Link* link = new Link;
+            link->dest = &tree[child];
+            link->distance = distance;
+            tree[parent].neighbors.push_back(link);
+        }
+    }
+
+    dfs_search(&tree[0], 0);
+    cout << theLongest;
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+-  위 문제와 사실상 동일한 문제인데, 입력 규격이 다소 달라서 코드를 반쯤 엎었다.  
+
+    - 루트 노드가 정해져 있지 않다는 사실이 신기했다.  어디에서 시작하던 같은 답을 낸다.
+    - 루트 노드가 없다는 건 부모노드도 없다는 것이다. 모든 Element들이 상하 관계 없이 Neighbor이다.  
+    - 입력으로 노드 번호 순서대로 오지도 않는다. 부모노드가 없기 때문에 가능하다.  
+    - 따라서 `visited`의 추가가 필요했다.
+
+- 이러한 방식은 코드 재활용을 하려던 나를 곤란하게 만들었던 문제였다.  
+
 </div>
 </details> 
 
 [def]: https://www.acmicpc.net/problem/1967
+[def2]: https://www.acmicpc.net/problem/1167
