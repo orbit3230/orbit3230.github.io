@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[Unreal Engine] 시작"
-excerpt: "뷰포트 탐색"
+excerpt: "뷰포트 탐색, 액터 이동 및 배치"
 
 tags:
   - [언리얼 엔진, Unreal, CPP]
