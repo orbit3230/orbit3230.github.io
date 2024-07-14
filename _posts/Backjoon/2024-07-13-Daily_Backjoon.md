@@ -1,18 +1,18 @@
 ---
 layout: post
-title: "[데일리 백준] 30678"
-excerpt: "1 Gold"
+title: "[데일리 백준] 11725"
+excerpt: "1 Silver"
 
 tags:
   - [데일리 백준, Backjoon]
 
 toc: true
 
-date: 2024-07-12
-last_modified_at: 2024-07-12
+date: 2024-07-13
+last_modified_at: 2024-07-13
 ---
-## Gold
-### [30678][def]
+## Silver
+### [11725][def]
 
 ```c++
 #include <iostream>
@@ -68,4 +68,4 @@ int main() {
 }
 ```
 
-[def]: https://www.acmicpc.net/problem/30678
+[def]: https://www.acmicpc.net/problem/11725
