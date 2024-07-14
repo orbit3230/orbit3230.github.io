@@ -228,7 +228,31 @@ last_modified_at: 2024-07-10
 
     <br>
 
-### 2. Aiming the Projectile
+### 2. Data Types
+- 다음으로 넘어가기 전에, 여러가지 데이터 타입들에 대하여 짚고 넘어가자.  
+지금까지도 블루프린트 노드들을 다루면서 여러가지 데이터 타입들을 마주했지만,  
+앞으로도 계속 마주치게 될 것이기 때문에 가볍게 정리하고 넘어가야 한다.  
+
+- 데이터 타입을 나눔으로써, 이 데이터로 무엇을 할 수 있는지 제한할 수 있는 방법이 된다.  
+데이터의 Shape 이라고 보면 된다.  
+Shape이 맞지 않은 잘못된 유형의 데이터는 Wrong type 핀에 연결할 수 없다.  
+
+- Data Types
+  - 기본 타입
+    - `Integer` : 정수형
+    - `Float` : 부동소수점형
+    - `String` : 문자열형
+    - `Bool `: Boolean형
+  - 객체
+    - `Struct` : 구조체
+      - 구조체는 레퍼런스를 사용하짐 않고 복사한다.
+      - 앞에서 보았던 `Vectors`, `Rotator` 들 또한 `x`, `y`, `z` 필드를 가지는 구조체이다.  
+      - `Transforms`는 위치, 회전, 스케일의 세 개의 구조체를 합친 더 큰 복합 구조체이다.  
+    - `Objects` 
+      - Actors (Cube, Projectile, ...)
+      - Components (StaticMeshComponent, ...)
+
+### 3. Aiming the Projectile
 
 ## BXP Level Build
 
