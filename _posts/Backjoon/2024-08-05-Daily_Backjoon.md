@@ -14,6 +14,8 @@ last_modified_at: 2024-08-05
 ## Gold
 ### [2252][def]
 
+- 위상 정렬에 대하여 공부하였음.
+
 ```c++
 #include <iostream>
 #include <vector>
