@@ -14,8 +14,6 @@ last_modified_at: 2024-08-09
 ## Gold
 ### [2473][def]
 
-- 투 포인터에 대하여 공부하였음.
-
 ```c++
 #include <iostream>
 #include <vector>
