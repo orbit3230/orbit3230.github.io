@@ -8,8 +8,8 @@ tags:
 
 toc: true
 
-date: 2024-08-27
-last_modified_at: 2024-08-27
+date: 2024-08-28
+last_modified_at: 2024-08-28
 ---
 ## Gold
 ### [6198][def]
