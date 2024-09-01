@@ -112,7 +112,7 @@ int main() {
 <summary>코멘트</summary>
 <div markdown="1">
 
-- 간단한 시뮬레이션 구현 문제
+- 간단한 시뮬레이션 구현 문제  
 
 </div>
 </details>
