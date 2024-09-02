@@ -4,7 +4,7 @@ title: "[연구실] Virtual Box - Ubuntu에서 터미널 안 열릴 때 해결�
 excerpt: "터미널 안 열릴 때, sudo 권한 부여"
 
 tags:
-  - [연구실, theme]
+  - [연구실, Ubuntu]
 
 toc: true
 
