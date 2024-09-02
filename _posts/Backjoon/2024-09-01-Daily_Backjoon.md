@@ -92,7 +92,7 @@ int main() {
 
 - 최소 스패닝 트리 with 크루스칼 알고리즘.
 
-- Union-Find 또한 복습하며 부족한 지식을 채웠다.  
+- Union-Find 또한 복습하며 부족한 지식을 채웠다.
 
 </div>
 </details>
