@@ -34,7 +34,7 @@ last_modified_at: 2024-09-02
 
 ![jekyll_3][def4]  
 
-- 따라서 해당 `{% raw %}{{`와 `}}{% endraw %}` 이전, 이후에 각각 `{% raw %}{% raw %}`와 `{% endraw %}{% endraw %}`를 추가하여 문제를 해결하였다.  
+- 따라서 해당 `{% raw %}{{`와 `}}{% endraw %}` 이전, 이후에 각각 `{% raw %}`와 `{% endraw %}`를 추가하여 문제를 해결하였다.  
 
 ![jekyll_4][def5]
 
