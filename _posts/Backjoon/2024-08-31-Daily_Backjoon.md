@@ -31,7 +31,7 @@ typedef struct Robot {
     int d;
 } Robot;
 
-vector<Direction> directions = {{-1, 0}, {0, 1}, {1, 0}, {0, -1}};  // 북, 동, 남, 서
+vector<Direction> directions = {{% raw %}{-1, 0}, {0, 1}, {1, 0}, {0, -1}{% endraw %}};  // 북, 동, 남, 서
 
 bool notCleaned(vector<vector<int>>& room, int n, int m, Robot& robot) {
     if(robot.x + 1 < n && room[robot.x+1][robot.y] == 0) return true;
