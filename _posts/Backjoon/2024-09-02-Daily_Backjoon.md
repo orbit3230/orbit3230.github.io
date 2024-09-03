@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[데일리 백준] 1197"
+title: "[데일리 백준] 1647"
 excerpt: "1 Gold"
 
 tags:
@@ -8,13 +8,11 @@ tags:
 
 toc: true
 
-date: 2024-09-01
-last_modified_at: 2024-09-01
+date: 2024-09-02
+last_modified_at: 2024-09-02
 ---
 ## Gold
-### [1197][def]
-
-- [최소 스패닝 트리][def2]와 [크루스칼 알고리즘][def3]에 대하여 공부하였다.
+### [1647][def]
 
 ```c++
 #include <iostream>
@@ -97,6 +95,4 @@ int main() {
 </div>
 </details>
 
-[def]: https://www.acmicpc.net/problem/1197
-[def2]: https://gmlwjd9405.github.io/2018/08/28/algorithm-mst.html
-[def3]: https://4legs-study.tistory.com/111
+[def]: https://www.acmicpc.net/problem/1647
