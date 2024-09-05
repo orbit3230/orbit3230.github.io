@@ -14,6 +14,8 @@ last_modified_at: 2024-09-05
 ## Platinum
 ### [1786][def]
 
+- [KMP 알고리즘][def2]에 대하여 공부하였다.  
+
 ```c++
 #include <iostream>
 #include <vector>
@@ -91,3 +93,4 @@ int main() {
 </details>
 
 [def]: https://www.acmicpc.net/problem/1786
+[def2]: https://bowbowbow.tistory.com/6
