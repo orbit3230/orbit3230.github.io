@@ -14,7 +14,8 @@ last_modified_at: 2024-07-11
 ## Silver
 ### [11660][def]
 
-- 첫 번째 방법 (가로 누적합만 계산 후 반복문) -> 250ms
+- 첫 번째 방법 (가로 누적합만 계산 후 반복문) -> 250ms  
+
 ```c++
 #include <iostream>
 #include <vector>
