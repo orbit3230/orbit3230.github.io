@@ -102,6 +102,77 @@ int main() {
 </div>
 </details>
 
+### [12891][def4]
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int mapping(char c) {
+    if(c == 'A') return 0;
+    if(c == 'C') return 1;
+    if(c == 'G') return 2;
+    if(c == 'T') return 3;
+    return -1;
+}
+
+bool checking(vector<int>& ACGT, vector<int>& makingACGT) {
+    for(int i = 0 ; i < 4 ; i++) {
+        if(ACGT[i] > makingACGT[i]) return false;
+    }
+    return true;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int s, p;
+    cin >> s >> p;
+    string input;
+    cin >> input;
+    vector<char> DNA(s);
+    for(int i = 0 ; i < s ; i++) {
+        DNA[i] = input[i];
+    }
+    vector<int> ACGT(4);
+    cin >> ACGT[0] >> ACGT[1] >> ACGT[2] >> ACGT[3];
+
+    int from = 0;
+    int to = from + p - 1;
+    vector<int> makingACGT(4, 0);  // 내가 잘라낸 비밀번호 내 ACGT 개수
+    int count = 0;
+    // initialize
+    for(int i = from ; i <= to ; i++) {
+        makingACGT[mapping(DNA[i])]++;
+    }
+    while(true) {
+        if(checking(ACGT, makingACGT)) {
+            count++;
+        }
+        from++; to++;
+        makingACGT[mapping(DNA[from - 1])]--;
+        if(to < s) makingACGT[mapping(DNA[to])]++;
+        else break;
+    }
+    cout << count;
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- 전형적인 간단한 슬라이딩 윈도우 문제.  
+
+- 슬라이딩 윈도우 개념을 적용하는 것 보다.  
+문자열 데이터 처리 구현이 더 까다로웠던 것 같다.  
+
+</div>
+</details>
+
 <br>
 
 ## Gold
@@ -161,8 +232,74 @@ int main() {
 `n <= 2000` 이라서 충분히 시간 내에 해결 가능하다.  
 
 </div>
-</details>
+</details>  
+
+### [15961][def5]
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n, d, k, c;
+    cin >> n >> d >> k >> c;
+    vector<int> sushi(n);
+    for(int i = 0 ; i < n ; i++) {
+        cin >> sushi[i];
+    }
+    int start = 0;
+    int end = start + k - 1;
+    int count = 0;
+    int maxCount = 0;
+    vector<int> selected(d+1, 0);  // 1-based index
+    for(int i = start ; i <= end ; i++) {
+        selected[sushi[i]]++;
+        if(selected[sushi[i]] == 1) {  // newly added
+            count++;
+        }
+    }
+    maxCount = count;
+
+    for(int i = 0 ; i < n ; i++) {
+        selected[sushi[start%n]]--;
+        if(selected[sushi[start%n]] == 0) count--;  // newly deleted
+        start++;
+        end++;
+        selected[sushi[end%n]]++;
+        if(selected[sushi[end%n]] == 1) count++;  // newly added
+        // using coupon
+        if(selected[c] == 0) {
+            count++;
+        }
+        if(count > maxCount) maxCount = count;
+        // used coupon(rewind)
+        if(selected[c] == 0) {
+            count--;
+        }
+    }
+    cout << maxCount;
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- 슬라이딩 윈도우 문제.  
+
+- 그러나 배열이 원형이라서 모듈러 연산을 활용해야 한다는 점이 실수하기 쉬웠다.  
+(easy to occur IndexError)
+
+</div>
+</details> 
 
 [def]: https://www.acmicpc.net/problem/2018
 [def2]: https://www.acmicpc.net/problem/1940
 [def3]: https://www.acmicpc.net/problem/1253
+[def4]: https://www.acmicpc.net/problem/12891
+[def5]: https://www.acmicpc.net/problem/15961
