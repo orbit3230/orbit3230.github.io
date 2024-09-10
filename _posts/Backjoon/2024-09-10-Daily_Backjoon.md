@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 2018"
-excerpt: "TODO"
+title: "[데일리 백준] 2018, 1940, 12891, 1253, 15961"
+excerpt: "3 Silver, 2 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
