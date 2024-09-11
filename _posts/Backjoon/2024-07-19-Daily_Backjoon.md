@@ -61,6 +61,46 @@ int main() {
 이 방법 말고, 비교 함수를 위한 구조체나 클래스를 만들어,  
 `operator()` 를 오버로딩하고 Functor로 응용하는 방식이 있던데 차후에 기회 된다면 떠올려서 써봐야겠다.  
 
+<br>
+
+- (9/11 자 추가 내용) **코드를 재작성하였다**. (꼴보기 싫어서)  
+
+```c++
+#include <iostream>
+#include <queue>
+using namespace std;
+
+typedef struct Element {
+    int x;
+    bool operator<(const Element& other) const {
+        return (abs(this->x) == abs(other.x)) ? (this->x > other.x) : abs(this->x) > abs(other.x);
+    }
+} Element;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n;
+    cin >> n;
+
+    int x;
+    priority_queue<Element> pq;
+    for(int i = 0 ; i < n ; i++) {
+        cin >> x;
+        if(x == 0) {
+            if(pq.empty()) cout << 0 << '\n';
+            else {
+                cout << pq.top().x << '\n';
+                pq.pop();
+            }
+        }
+        else pq.push({x});
+    }
+}
+```
+
 </div>
 </details>
 
