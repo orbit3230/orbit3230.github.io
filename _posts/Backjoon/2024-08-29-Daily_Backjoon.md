@@ -31,7 +31,7 @@ int main() {
         square = base * base;
         long long start = (min + square - 1) / square * square;  // min 이상인 square의 배수 중 최솟값
         for(long long num = start ; num <= max ; num += square) {
-            if(num >= min && !m[num-min]) {
+            if(!m[num-min]) {
                 m[num-min] = true;
                 count--;
             }
