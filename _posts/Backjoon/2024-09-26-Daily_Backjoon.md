@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[데일리 백준] 1456, 1850, 1990"
+title: "[데일리 백준] 1934, 1850, 1990"
 excerpt: "1 Bronze, 1 Silver, 1 Gold"
 
 tags:
@@ -12,7 +12,7 @@ date: 2024-09-26
 last_modified_at: 2024-09-26
 ---
 ## Bronze
-### [1456][def]
+### [1934][def]
 
 ```c++
 #include <iostream>
@@ -53,7 +53,7 @@ int main() {
 <br>
 
 ## Silver
-### [1456][def2]
+### [1850][def2]
 
 ```c++
 #include <iostream>
