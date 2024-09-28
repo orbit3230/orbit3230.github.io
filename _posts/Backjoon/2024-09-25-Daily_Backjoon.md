@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[데일리 백준] 1747, 1456, 4355, 4355"
+title: "[데일리 백준] 1747, 1456, 11689, 4355"
 excerpt: "1 Silver, 3 Gold"
 
 tags:
@@ -123,7 +123,7 @@ int main() {
 </div>
 </details>
 
-### [4355][def3]
+### [11689][def6]
 
 ```c++
 #include <iostream>
@@ -214,3 +214,4 @@ int main() {
 [def3]: https://www.acmicpc.net/problem/4355
 [def4]: https://www.acmicpc.net/problem/4355
 [def5]: https://www.acmicpc.net/problem/13926
+[def6]: https://www.acmicpc.net/problem/11689
