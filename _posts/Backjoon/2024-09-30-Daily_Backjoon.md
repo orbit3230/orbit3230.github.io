@@ -78,9 +78,13 @@ int main() {
 
 - bottom-up 다이나믹 프로그래밍 기법을 활용한 문제.
 
-- DP 배열의 컨트롤이 너무나도 까다로웠다.
+- DP 배열의 컨트롤이 너무나도 까다로웠다.  
+
+- 이 문제를 풀면서 작성한 알고리즘 구상 과정  
+![idea][def2]
 
 </div>
 </details>
 
 [def]: https://www.acmicpc.net/problem/11049
+[def2]: https://i.imgur.com/UPPqjhR.png
