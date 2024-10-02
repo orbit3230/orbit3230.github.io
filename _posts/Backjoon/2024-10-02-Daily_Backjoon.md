@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 1987"
-excerpt: "1 Gold"
+title: "[데일리 백준] 1987, 1517"
+excerpt: "1 Gold, 1 Platinum"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -67,4 +67,72 @@ int main() {
 </div>
 </details>
 
+<br>
+
+## Platinum
+### [1517][def2]
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+void merge_sort(vector<int>& list, int start, int end, long long& result, vector<int>& result_list) {
+    if(start - end == 0) return;
+    int mid = (start + end) / 2;
+    merge_sort(list, start, mid, result, result_list);
+    merge_sort(list, mid+1, end, result, result_list);
+    int index = start;
+    int left_index = start; int right_index = mid+1;
+    while(left_index <= mid && right_index <= end) {
+        if(list[left_index] <= list[right_index]) {
+            result_list[index++] = list[left_index++];
+        }
+        else {
+            result_list[index++] = list[right_index++];
+            result += mid - left_index + 1;  // 왼쪽 배열에서 남은 개수, 즉 뛰어넘은 개수 만큼 swap이 일어난다.
+        }
+    }
+    // 잔반 처리
+    while(left_index <= mid) {
+        result_list[index++] = list[left_index++];
+    }
+    while(right_index <= end) {
+        result_list[index++] = list[right_index++];
+    }
+    for(int i = start ; i <= end ; i++) {
+        list[i] = result_list[i];
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n;
+    cin >> n;
+    vector<int> list(n);
+    for(int i = 0 ; i < n ; i++) {
+        cin >> list[i];
+    }
+
+    long long result = 0;
+    vector<int> result_list(n);
+    merge_sort(list, 0, n-1, result, result_list);
+    cout << result;
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- Merge sort를 직접 구현해보는 문제.
+
+- 버블 소트의 총 swap 횟수가 결국 머지 소트에서 오른쪽 배열의 element가 왼쪽 배열의 element들을 뛰어넘는 개수의 총합과 같기 때문이다.
+
+</div>
+</details>
+
 [def]: https://www.acmicpc.net/problem/1987
+[def2]: https://www.acmicpc.net/problem/1517
