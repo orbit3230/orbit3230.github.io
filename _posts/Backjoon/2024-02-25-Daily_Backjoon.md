@@ -213,9 +213,38 @@ public class P_1920 {
 <summary>코멘트</summary>
 <div markdown="1">
 
-  - 정렬과 탐색을 주제로한 문제였는데  
-  그냥 외부 라이브러리 함수 써버림.  
-  근데 사실 외부 함수 적절하게 잘 가져다 쓰는 것도 실력아닐까?
+  - c++ 구현 코드
+
+  	```c++
+  	#include <iostream>
+	#include <unordered_set>
+	using namespace std;
+
+	int main() {
+		ios::sync_with_stdio(false);
+		cin.tie(NULL);
+		cout.tie(NULL);
+		
+		int n;
+		cin >> n;
+		unordered_set<int> s;
+		int input;
+		for(int i = 0 ; i < n ; i++) {
+			cin >> input;
+			s.insert(input);
+		}
+		int m;
+		cin >> m;
+		for(int i = 0 ; i < m ; i++) {
+			cin >> input;
+			if(s.find(input) != s.end()) {
+				cout << "1\n";
+				continue;
+			}
+			cout << "0\n";
+		}
+	}
+  	```
 
 </div>
 </details>
