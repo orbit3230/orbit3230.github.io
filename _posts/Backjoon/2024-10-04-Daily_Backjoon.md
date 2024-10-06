@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[데일리 백준] 2343"
+title: "[데일리 백준] 1300"
 excerpt: "1 Gold"
 
 tags:
@@ -12,7 +12,7 @@ date: 2024-10-04
 last_modified_at: 2024-10-04
 ---
 ## Gold
-### [2343][def]
+### [1300][def]
 
 ```c++
 #include <iostream>
@@ -58,4 +58,4 @@ int main() {
 </div>
 </details>
 
-[def]: https://www.acmicpc.net/problem/2343
+[def]: https://www.acmicpc.net/problem/1300
