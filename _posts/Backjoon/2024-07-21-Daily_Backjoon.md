@@ -89,6 +89,49 @@ int main() {
 }
 ```
 
+- 10/06 일 자 재풀이. 250ms 전후로 매우 빠른 코드이다.(백준 상위 0.1%)  
+
+```c++
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+typedef struct Element {
+    int value;
+    int origin_order;
+} Element;
+
+bool compare(const Element& e1, const Element& e2) {
+    return e1.value < e2.value;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n;
+    cin >> n;
+    vector<Element> list(n);
+    for(int i = 0 ; i < n ; i++) {
+        cin >> list[i].value;
+        list[i].origin_order = i;
+    }
+    sort(list.begin(), list.end(), compare);
+
+    int rank = -1;
+    int prev = INT32_MIN;
+    vector<int> ordering(n);
+    for(Element& e : list) {
+        if(e.value != prev) rank++;
+        ordering[e.origin_order] = rank;
+        prev = e.value;
+    }
+    for(int order : ordering) cout << order << ' ';
+}
+```
+
 </div>
 </details>
 
