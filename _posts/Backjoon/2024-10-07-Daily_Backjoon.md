@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 3151"
-excerpt: "1 Gold"
+title: "[데일리 백준] 3151, 2110"
+excerpt: "2 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -72,4 +72,60 @@ int main() {
 </div>
 </details>
 
+### [2110][def2]
+
+```c++
+#include <iostream>
+#include <vector>
+#include <algorithm>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n, c;
+    cin >> n >> c;
+    vector<int> houses(n);
+    for(int i = 0 ; i < n ; i++) cin >> houses[i];
+    sort(houses.begin(), houses.end());
+
+    int left = 1;
+    int right = houses[n-1] - houses[0];
+    int result = 0;
+    while(left <= right) {
+        int mid = (left + right) / 2;  // 임의의 공유기 사이의 거리 값
+        int count = 1;
+        int distance = 0;
+        for(int i = 1 ; i < n ; i++) {
+            distance += houses[i] - houses[i-1];
+            if(distance >= mid) {
+                count++;
+                distance = 0;
+                if(count == c) break;
+            }
+        }
+        if(count == c) {
+            left = mid + 1;
+            result = mid;
+            continue;
+        }
+        right = mid - 1;
+    }
+    cout << result;
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- Parametric Search + Binary Search
+
+- 이제 매개변수 탐색의 전형적인 문제들의 접근 방법을 단번에 알 수 있을 것 같다.
+
+</div>
+</details>
+
 [def]: https://www.acmicpc.net/problem/3151
+[def2]: https://www.acmicpc.net/problem/2110
