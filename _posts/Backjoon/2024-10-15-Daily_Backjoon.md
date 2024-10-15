@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 1325, 1707"
-excerpt: "1 Silver, 1 Gold"
+title: "[데일리 백준] 1325, 18352, 1707"
+excerpt: "2 Silver, 1 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -77,6 +77,82 @@ int main() {
 - 무난한 그래프 탐색 문제.
 
 - 가장 긴 그래프 연결을 찾는 브루트포스 문제.
+
+</div>
+</details>
+
+### [18352][def3]
+
+```c++
+#include <iostream>
+#include <vector>
+#include <queue>
+#include <algorithm>
+using namespace std;
+
+typedef struct Node {
+    int index;
+    vector<Node*> neighbors;
+    bool visited = false;
+    int step = 0;
+} Node;
+
+void bfs_search(vector<Node>& nodes, Node& current, int k, vector<int>& exact) {
+    current.visited = true;
+    queue<Node*> q;
+    q.push(&current);
+    Node* n;
+    while(!q.empty()) {
+        n = q.front();
+        q.pop();
+        if(n->step > k) break;
+        if(n->step == k) exact.push_back(n->index);
+        for(Node* next : n->neighbors) {
+            if(!next->visited) {
+                next->step = n->step+1;
+                next->visited = true;
+                q.push(next);
+            }
+        }
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n, m, k, x;
+    cin >> n >> m >> k >> x;
+    x--;  // 0-based index
+    vector<Node> nodes(n);
+    for(int i = 0 ; i < n ; i++) {
+        nodes[i].index = i+1;  // 1-based index
+    }
+    int a, b;
+    for(int i = 0 ; i < m ; i++) {
+        cin >> a >> b;
+        a--; b--;  // 0-based index
+        nodes[a].neighbors.push_back(&nodes[b]);
+    }
+    vector<int> exact;
+    bfs_search(nodes, nodes[x], k, exact);
+    if(exact.empty()) {
+        cout << -1;
+        return 0;
+    }
+    sort(exact.begin(), exact.end());
+    for(int i : exact) cout << i << '\n';
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- 무난한 BFS 문제.
+
+- 양방향 그래프인 줄 알았는데 단방향 그래프였다. 문제를 잘 읽도록
 
 </div>
 </details>
@@ -169,3 +245,4 @@ int main() {
 
 [def]: https://www.acmicpc.net/problem/1325
 [def2]: https://www.acmicpc.net/problem/1707
+[def3]: https://www.acmicpc.net/problem/18352
