@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 1325, 18352, 1707"
-excerpt: "2 Silver, 1 Gold"
+title: "[데일리 백준] 1325, 18352, 1707, 2749"
+excerpt: "2 Silver, 2 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -242,7 +242,71 @@ int main() {
 </div>
 </details>
 
+### [2749][def4]
+
+```c++
+#include <iostream>
+#include <vector>
+#define DIV 1000000
+using namespace std;
+
+// 계산 결과는 a에 담아서 줍니다.
+void multiply(vector<vector<long long>>& a, const vector<vector<long long>>& b) {
+    long long lt = (a[0][0]*b[0][0] + a[0][1]*b[1][0]) % DIV;
+    long long lb = (a[1][0]*b[0][0] + a[1][1]*b[1][0]) % DIV;
+    long long rt = (a[0][0]*b[0][1] + a[0][1]*b[1][1]) % DIV;
+    long long rb = (a[1][0]*b[0][1] + a[1][1]*b[1][1]) % DIV;
+    a[0][0] = lt; a[0][1] = rt; a[1][0] = lb; a[1][1] = rb;
+}
+void power(vector<vector<long long>>& a, long long n, const vector<vector<long long>>& origin) {
+    if(n == 1) return;
+    power(a, n/2, origin);
+    multiply(a, a);  // a = a^2
+    // e.g.,
+    // 13 -> 6 -> 3 -> 1
+    // 1 -> 2(+1) -> 6 -> 12(+1) = 13 (복원을 위한 +1)
+    if(n % 2 == 1) {
+        multiply(a, origin);
+    }
+}
+
+// [[0, 1][1, 1]]^x = [[fib(x-1), fib(x)][fib(x), fib(x+1)]]
+long long fibonacci(long long n) {
+  vector<vector<long long>> matrix(2, vector<long long>(2, 1));
+  matrix[0][0] = 0;
+  const vector<vector<long long>> origin = matrix;
+  
+  power(matrix, n, origin);
+  
+  return matrix[0][1];
+}
+
+int main() {
+  long long n;
+  cin >> n;
+  cout << fibonacci(n);
+
+  return 0;
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- 분할 정복을 활용한 피보나치 수열 계산 문제 !!
+
+- 굉장히 신기했다. 피보나치 수열을 행렬의 거듭 제곱으로 표현 가능하다는 사실이 놀라웠다.  
+
+- 또한 이것을 분할 정복으로 구하는, 특히 홀수를 처리하는 기법이 신기했다.
+
+- 어쩌다보니 알고리즘 과제하다가 서버가 터져서 똑같이 생긴 백준 문제를 풀어버림.  
+
+</div>
+</details>
+
 
 [def]: https://www.acmicpc.net/problem/1325
 [def2]: https://www.acmicpc.net/problem/1707
 [def3]: https://www.acmicpc.net/problem/18352
+[def4]: https://www.acmicpc.net/problem/2749
