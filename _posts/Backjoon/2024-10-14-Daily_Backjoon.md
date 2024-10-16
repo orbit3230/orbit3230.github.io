@@ -17,35 +17,35 @@ last_modified_at: 2024-10-14
 ```c++
 #include <iostream>
 #include <vector>
-#define DIV 10007
 using namespace std;
-
-vector<vector<int>> dp(53, vector<int>(53, 0));
-
-int combination(int n, int r) {
-    if(dp[n][r] != 0) return dp[n][r];
-    if(n == r || r == 0) return dp[n][r] = 1;
-    return dp[n][r] = (combination(n-1, r-1) + combination(n-1, r)) % DIV;
+// traveling salesman problem
+int tsp(vector<vector<int>>& matrix, vector<vector<int>>& dpTable, int prev, int mask, const int n) {
+    if(mask == (1 << n) - 1) {  // all '1' -> optimal tour success, return to start point
+        return (matrix[prev][0] == 0) ? INT32_MAX/2 : matrix[prev][0];  // div 2 : prevent overflow
+    }
+    // using memoization
+    if(dpTable[prev][mask] != 0) return dpTable[prev][mask];
+    dpTable[prev][mask] = INT32_MAX/2;  // div 2 : prevent overflow
+    for(int i = 1 ; i < n ; i++) {
+        // not visited && has route
+        if((mask & (1 << i)) == 0 && matrix[prev][i] != 0) {
+            dpTable[prev][mask]
+            = min(dpTable[prev][mask], tsp(matrix, dpTable, i, mask | (1 << i), n)+matrix[prev][i]);
+        }
+    }
+    return dpTable[prev][mask];
 }
 
 int main() {
     int n;
     cin >> n;
-    if(n < 4) {
-        cout << 0;
-        return 0;
+    vector<vector<int>> matrix(n, vector<int>(n));
+    for(int i = 0 ; i < n ; i++) {
+        for(int j = 0 ; j < n ; j++) cin >> matrix[i][j];
     }
-    
-    int result = 0;
-    for(int pair = 1; pair <= n / 4; pair++) {
-        if(pair % 2 == 1) {
-            result = (result + (combination(13, pair) * combination(52-pair*4, n-pair*4)) % DIV) % DIV;
-        }
-        else {
-            result = (result - (combination(13, pair) * combination(52-pair*4, n-pair*4)) % DIV + DIV) % DIV;
-        }
-    }
-    cout << result << endl;
+    vector<vector<int>> dpTable(n, vector<int>(1 << n, 0));  // bit-masking index
+    int result = tsp(matrix, dpTable, 0, 1, n);
+    cout << result;
 }
 ```
 
