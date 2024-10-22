@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] "
-excerpt: ""
+title: "[데일리 백준] 1780, 1992, 4803, 4803"
+excerpt: "3 Silver, 1 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -146,19 +146,104 @@ int main() {
 </div>
 </details>
 
-<br>
-
-## Gold
-### []()
+### [4803][def4]
 
 ```c++
+#include <iostream>
+using namespace std;
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int t;
+    cin >> t;
+    for(int i = 0 ; i < t ; i++) {
+        int n, m;
+        cin >> n >> m;
+        cout << n-1 << '\n';
+        for(int j = 0 ; j < m ; j++) cin >> n >> n;
+    }
+}
 ```
 
 <details>
 <summary>코멘트</summary>
 <div markdown="1">
 
-- 
+- 연결 그래프에서 최소 스패닝 트리를 찾으려면, `n-1`개의 edge가 필요하겠죠.
+
+</div>
+</details>
+
+<br>
+
+## Gold
+### [4803][def5]
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+typedef struct Node {
+    vector<Node*> nexts;
+    bool visited = false;
+    int step = 0;
+} Node;
+
+void dfs_search(Node& node, int step, bool& isTree) {
+    node.visited = true;
+    node.step = step;
+    for(Node* next : node.nexts) {
+        if(next->visited) {
+            if(next->step != step-1) isTree = false;  // 사이클 발생
+            continue;
+        }
+        dfs_search(*next, step+1, isTree);
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n, m;
+    int caseIndex = 1;
+    while(cin >> n >> m) {
+        if(n == 0 && m == 0) break;
+        vector<Node> nodes(n);
+        int from, to;
+        for(int i = 0 ; i < m ; i++) {
+            cin >> from >> to;
+            from--; to--;  // 0-based index
+            nodes[from].nexts.push_back(&nodes[to]);
+            nodes[to].nexts.push_back(&nodes[from]);
+        }
+        int trees = 0;
+        bool isTree;
+        for(int i = 0 ; i < n ; i++) {
+            if(nodes[i].visited) continue;
+            isTree = true;
+            dfs_search(nodes[i], 0, isTree);
+            if(isTree) trees++;
+        }
+        cout << "Case " << caseIndex++ << ": ";
+        if(trees == 0) cout << "No trees.";
+        else if(trees == 1) cout << "There is one tree.";
+        else cout << "A forest of " << trees << " trees.";
+        cout << '\n';
+    }
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- 사이클이 없는 그래프를 찾는 그래프 탐색 문제.  
 
 </div>
 </details>
@@ -166,3 +251,5 @@ int main() {
 [def]: https://www.acmicpc.net/problem/1780
 [def2]: https://www.acmicpc.net/problem/2630
 [def3]: https://www.acmicpc.net/problem/1992
+[def4]: https://www.acmicpc.net/problem/4803
+[def5]: https://www.acmicpc.net/problem/4803
