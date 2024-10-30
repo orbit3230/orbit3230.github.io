@@ -15,14 +15,31 @@ last_modified_at: 2024-10-30
 ### [1149][def]
 
 ```c++
+#include <iostream>
+#include <vector>
+#define DIV 10007
+using namespace std;
 
+int main() {
+    int n;
+    cin >> n;
+    vector<int> dpTable(n+1);
+    dpTable[1] = 1;
+    dpTable[2] = 3;
+    for(int i = 3 ; i <= n ; i++) {
+        dpTable[i] = (dpTable[i-1]%DIV + (dpTable[i-2]<<1)%DIV)%DIV;
+    }
+    cout << dpTable[n];
+}
 ```
 
 <details>
 <summary>코멘트</summary>
 <div markdown="1">
 
-- 
+- 다이나믹 프로그래밍 문제.
+
+- 점화식을 찾는 과정이 어려웠다.  
 
 </div>
 </details>
