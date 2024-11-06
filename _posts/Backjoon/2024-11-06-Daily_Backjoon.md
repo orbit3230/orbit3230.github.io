@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 1916"
-excerpt: "1 Gold"
+title: "[데일리 백준] 1916, 11657"
+excerpt: "2 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -85,5 +85,80 @@ int main() {
 </div>
 </details>
 
+### [11657][def3]
+
+```c++
+#include <iostream>
+#include <vector>
+#define INF INT32_MAX
+using namespace std;
+
+typedef struct Bus {
+    short from;
+    short to;
+    short weight;
+} Bus;
+
+void bellman_ford(vector<long long>& cities, vector<Bus>& buses, int n) {
+    for(int i = 0 ; i < n-1 ; i++) {
+        for(Bus& b : buses) {
+            if(cities[b.to] == INF && cities[b.from] == INF) continue;
+            if(cities[b.to] > cities[b.from] + b.weight) {
+                cities[b.to] = cities[b.from] + b.weight;
+            }
+        }
+    }
+}
+bool minus_cycle_check(vector<long long>& cities, vector<Bus>& buses, int n) {
+    for(int i = 0 ; i < n-1 ; i++) {
+        for(Bus& b : buses) {
+            if(cities[b.to] == INF && cities[b.from] == INF) continue;
+            if(cities[b.to] > cities[b.from] + b.weight) {
+                return true;
+            }
+        }
+    }
+    return false;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n, m;
+    cin >> n >> m;
+    vector<long long> cities(n+1, INF);
+    vector<Bus> buses(m);
+    for(int i = 0 ; i < m ; i++) {
+        cin >> buses[i].from >> buses[i].to >> buses[i].weight;
+    }
+    cities[1] = 0;
+    bellman_ford(cities, buses, n);
+    if(minus_cycle_check(cities, buses, n)) {
+        cout << -1;
+        return 0;
+    }
+    for(int i = 2 ; i <= n ; i++) {
+        if(cities[i] == INF) cout << -1 << '\n';
+        else cout << cities[i] << '\n';
+    }
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- Bellman-Ford Algorithm
+
+- 배운 점
+  - 아직 아예 개통되지 않은, 즉 두 노드가 모두 `INF`인 경우에는 서로를 가지고 값을 갱신해서는 안된다.  
+  `continue`로 넘어갈 것.  
+
+</div>
+</details>
+
 [def]: https://www.acmicpc.net/problem/1916
 [def2]: https://orbit3230.github.io/2024/11/05/Daily_Backjoon/
+[def3]: https://www.acmicpc.net/problem/11657
