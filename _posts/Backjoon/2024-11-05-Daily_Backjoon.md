@@ -83,8 +83,10 @@ void dijkstra(vector<Node>& nodes, int start) {
     priority_queue<pair<int, int>, vector<pair<int, int>>, greater<pair<int, int>>> pq;
     pq.push({nodes[start].path, start});
     while(!pq.empty()) {
+        int weight = pq.top().first;
         int index = pq.top().second;
         pq.pop();
+        if(weight > nodes[index].path) continue;
         for(Edge* e : nodes[index].nexts) {
             int next = e->to;
             int origin_path = nodes[next].path;
