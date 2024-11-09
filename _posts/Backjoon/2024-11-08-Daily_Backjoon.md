@@ -1,7 +1,7 @@
 ---
 layout: post
 title: "[데일리 백준] 2217"
-excerpt: "1 Gold"
+excerpt: "1 Silver"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -11,7 +11,7 @@ toc: true
 date: 2024-11-08
 last_modified_at: 2024-11-08
 ---
-## Gold
+## Silver
 ### [2217][def]
 
 ```c++
