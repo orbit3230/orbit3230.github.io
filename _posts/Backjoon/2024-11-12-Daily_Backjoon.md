@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 1865"
-excerpt: "1 Gold"
+title: "[데일리 백준] 1865, 1976"
+excerpt: "2 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -97,4 +97,68 @@ int main() {
 </div>
 </details>
 
+### [1976][def2]
+
+```c++
+#include <iostream>
+#include <vector>
+using namespace std;
+
+int find(vector<int>& cities, int index) {
+    if(cities[index] == index) return index;
+    return cities[index] = find(cities, cities[index]);
+}
+
+void unions(vector<int>& cities, int from, int to) {
+    int root1 = find(cities, from);
+    int root2 = find(cities, to);
+    if(root1 != root2) {
+        cities[root2] = cities[root1];
+    }
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+
+    int n, m;
+    cin >> n >> m;
+    vector<int> cities(n);
+    for(int i = 0 ; i < n ; i++) cities[i] = i;  // root is itself
+    bool connected;
+    for(int i = 0 ; i < n ; i++) {
+        for(int j = 0 ; j < n ; j++) {
+            cin >> connected;
+            if(i > j) continue;
+            if(connected) unions(cities, i, j);
+        }
+    }
+    int from, to;
+    for(int i = 0 ; i < m ; i++) {
+        from = to;
+        cin >> to;
+        to--;  // 0-based index
+        if(i == 0) continue;
+        if(find(cities, from) != find(cities, to)) {
+            cout << "NO";
+            return 0;
+        }
+    }
+    cout << "YES";
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- Union-Find Algorithm
+
+- union 시에 인덱스를 direct로 지정해 주는 것이 아니라  
+root를 찾아서 할당해 주어야 한다는 사실을 잊지 말자.  
+
+</div>
+</details>
+
 [def]: https://www.acmicpc.net/problem/1865
+[def2]: https://www.acmicpc.net/problem/1976
