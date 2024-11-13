@@ -1,7 +1,7 @@
 ---
 layout: post
-title: "[데일리 백준] 2042, 10868"
-excerpt: "2 Gold"
+title: "[데일리 백준] 2042, 10868, 11505"
+excerpt: "3 Gold"
 
 tags:
   - [데일리 백준, Backjoon]
@@ -140,5 +140,80 @@ int main() {
 </div>
 </details>
 
+### [11505][def3]
+
+```c++
+#include <iostream>
+#include <vector>
+#define DIV 1000000007
+using namespace std;
+
+void makeSegtree(vector<int>& segtree, int leafIndex) {
+    long long result;
+    for(int i = leafIndex-1 ; i >= 1; i--) {
+        result = segtree[i<<1] % DIV;
+        result *= segtree[(i<<1)+1] % DIV;
+        segtree[i] = result % DIV;
+    }
+}
+void update(vector<int>& segtree, int b, int c, int leafIndex) {
+    int index = leafIndex + b - 1;
+    segtree[index] = c;
+    long long result;
+    while((index >>= 1) >= 1) {
+        result = segtree[index<<1] % DIV;
+        result *= segtree[(index<<1)+1] % DIV;
+        segtree[index] = result % DIV;
+    }
+}
+int findMul(const vector<int>& segtree, int start, int end, int b, int c, int index) {
+    if(c < start || end < b) return 1;
+    if(b <= start && end <= c) return segtree[index];
+    int mid = (start + end) / 2;
+    long long result = findMul(segtree, start, mid, b, c, index*2) % DIV;
+    result *= findMul(segtree, mid+1, end, b, c, index*2+1) % DIV;
+    return result % DIV;
+}
+
+int main() {
+    ios::sync_with_stdio(false);
+    cin.tie(NULL);
+    cout.tie(NULL);
+
+    int n, m, k;
+    cin >> n >> m >> k;
+    int size = 1;
+    while(size < n) size <<= 1;
+    size <<= 1;
+    vector<int> segtree(size, 1);
+    int leafIndex = size >> 1;
+    for(int i = 0 ; i < n ; i++) {
+        cin >> segtree[leafIndex + i];
+    }
+    makeSegtree(segtree, leafIndex);
+    int a, b, c;
+    for(int i = 0 ; i < m+k ; i++) {
+        cin >> a >> b >> c;
+        if(a == 1) {
+            update(segtree, b, c, leafIndex);
+            continue;
+        }
+        cout << findMul(segtree, 1, leafIndex, b, c, 1) << '\n';
+    }
+}
+```
+
+<details>
+<summary>코멘트</summary>
+<div markdown="1">
+
+- 세그먼트 트리.
+
+- 모듈러 연산 처리에 자신이 있다면 `int` 타입 벡터로도 충분히 처리 가능하다.  
+
+</div>
+</details>
+
 [def]: https://www.acmicpc.net/problem/2042
 [def2]: https://www.acmicpc.net/problem/10868
+[def3]: https://www.acmicpc.net/problem/11505
