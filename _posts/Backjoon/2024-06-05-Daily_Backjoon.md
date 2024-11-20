@@ -1,6 +1,6 @@
 ---
 layout: post
-title: "[데일리 백준] 28702, 30802, 11047"
+title: "[데일리 백준] 28702, 30802, 1021"
 excerpt: "2 Bronze(for Solve.ac - class 2), 1 Silver"
 
 tags:
@@ -74,7 +74,7 @@ int main() {
 <br>
 
 ## Silver
-### [11047][def]
+### [1021][def]
 
 ```c++
 #include <iostream>
@@ -133,6 +133,6 @@ iterator가 더 이상 유효하지 않은 데이터를 가리키게 되기 때�
 </div>
 </details>
 
-[def]: https://www.acmicpc.net/problem/11047
+[def]: https://www.acmicpc.net/problem/1021
 [def2]: https://www.acmicpc.net/problem/28702
 [def3]: https://www.acmicpc.net/problem/30802
