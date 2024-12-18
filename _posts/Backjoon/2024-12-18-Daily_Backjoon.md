@@ -8,8 +8,8 @@ tags:
 
 toc: true
 
-date: 2024-12-17
-last_modified_at: 2024-12-17
+date: 2024-12-18
+last_modified_at: 2024-12-18
 ---
 ## Gold
 - 시험 대비 5문제 풀이
