@@ -51,7 +51,7 @@ int main() {
 ```
 
 <details>
-<summary>코멘트 ★</summary>
+<summary>코멘트</summary>
 <div markdown="1">
 
 - 누적 합 + 투 포인터

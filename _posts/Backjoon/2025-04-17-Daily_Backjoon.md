@@ -64,7 +64,7 @@ int main() {
 ```
 
 <details>
-<summary>코멘트 ★</summary>
+<summary>코멘트</summary>
 <div markdown="1">
 
 - LCA (easy)
