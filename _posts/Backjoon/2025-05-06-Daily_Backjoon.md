@@ -21,7 +21,7 @@ last_modified_at: 2025-05-06
 using namespace std;
 
 bool bfs(vector<vector<bool>>& board, int n, int k) {
-    // {{x, y}, time}
+    // {(x, y), time}
     queue<pair<pair<int, int>, int>> q;
     q.push({{0, 0}, 0});
     board[0][0] = false;
