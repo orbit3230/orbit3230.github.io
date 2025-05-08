@@ -21,7 +21,7 @@ last_modified_at: 2025-05-06
 using namespace std;
 
 bool bfs(vector<vector<bool>>& board, int n, int k) {
-    // {(x, y), time}
+    // {% raw %}{{x, y}, time}{% endraw %}
     queue<pair<pair<int, int>, int>> q;
     q.push({{0, 0}, 0});
     board[0][0] = false;
@@ -32,17 +32,17 @@ bool bfs(vector<vector<bool>>& board, int n, int k) {
         q.pop();
         if(y+1 >= n) return true;
         if(board[x][y+1]) {
-            q.push({{x, y+1}, time+1});
+            q.push({% raw %}{{x, y+1}, time+1}{% endraw %});
             board[x][y+1] = false;
         }
         if(y > 0 && y-1 > time && board[x][y-1]) {
-            q.push({{x, y-1}, time+1});
+            q.push({% raw %}{{x, y-1}, time+1}{% raw %});
             board[x][y-1] = false;
         }
         if(y+k >= n) return true;
         x ^= 1;
         if(board[x][y+k]) {
-            q.push({{x, y+k}, time+1});
+            q.push({% raw %}{{x, y+k}, time+1}{% endraw %});
             board[x][y+k] = false;
         }
     }
