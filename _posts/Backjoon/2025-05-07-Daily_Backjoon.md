@@ -29,7 +29,7 @@ int main() {
 <summary>코멘트</summary>
 <div markdown="1">
 
-- 비둘기집 원리
+- 비둘기집 원리 
 
 </div>
 </details>

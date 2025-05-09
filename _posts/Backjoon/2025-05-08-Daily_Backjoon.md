@@ -48,7 +48,7 @@ int main() {
 <summary>코멘트</summary>
 <div markdown="1">
 
-- 정렬 (날먹) 
+- 정렬 (날먹)  
 
 </div>
 </details>

@@ -23,7 +23,7 @@ using namespace std;
 bool bfs(vector<vector<bool>>& board, int n, int k) {
     // {% raw %}{{x, y}, time}{% endraw %}
     queue<pair<pair<int, int>, int>> q;
-    q.push({{0, 0}, 0});
+    q.push({% raw %}{{0, 0}, 0}{% endraw %});
     board[0][0] = false;
     while(!q.empty()) {
         int x = q.front().first.first;
@@ -63,7 +63,6 @@ int main() {
     }
     cout << (bfs(board, n, k) ? 1 : 0);
 }
-
 ```
 
 <details>
