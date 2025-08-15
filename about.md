@@ -8,3 +8,7 @@ title: About
 author : 21학번 KSH
 
 e-mail : hu0868@naver.com
+
+<br>
+
+![saa-c03](aws-certified-solutions-architect-associate.png)
