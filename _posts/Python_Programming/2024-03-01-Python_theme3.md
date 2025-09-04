@@ -4,7 +4,7 @@ title: "[파이썬 프로그래밍] theme 3 - 변수와 데이터형"
 excerpt: "파이썬의 변수 타입, 형식지정자, 이스케이프 문자, 그리고 __main__"
 
 tags:
-  - [파이썬 프로그래밍, python]
+  - [파이썬 프로그래밍, Python]
 
 toc: true
 

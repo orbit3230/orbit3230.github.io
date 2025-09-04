@@ -4,7 +4,7 @@ title: "[파이썬 프로그래밍] theme 6 - 반복문"
 excerpt: "for 문, while 문"
 
 tags:
-  - [파이썬 프로그래밍, python]
+  - [파이썬 프로그래밍, Python]
 
 toc: true
 

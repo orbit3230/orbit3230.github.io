@@ -4,7 +4,7 @@ title: "[파이썬 프로그래밍] theme 8 - 문자열"
 excerpt: "문자열 접근 방식, 문자열 메소드"
 
 tags:
-  - [파이썬 프로그래밍, python]
+  - [파이썬 프로그래밍, Python]
 
 toc: true
 

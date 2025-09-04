@@ -4,7 +4,7 @@ title: "[파이썬 프로그래밍] theme 1 - 파이썬의 기초"
 excerpt: "파이썬 언어 소개, 언어의 특징, 파이썬 프로그램 작성 요령"
 
 tags:
-  - [파이썬 프로그래밍, python]
+  - [파이썬 프로그래밍, Python]
 
 toc: true
 

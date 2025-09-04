@@ -4,7 +4,7 @@ title: "[파이썬 프로그래밍] theme 5 - 조건문"
 excerpt: "if문, if~else문, if~elif~else문, 삼항연산자, 그리고 리스트 맛보기"
 
 tags:
-  - [파이썬 프로그래밍, python]
+  - [파이썬 프로그래밍, Python]
 
 toc: true
 
