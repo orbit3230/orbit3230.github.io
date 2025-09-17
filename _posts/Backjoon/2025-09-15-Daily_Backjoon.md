@@ -42,7 +42,7 @@ int main() {
 <summary>코멘트</summary>
 <div markdown="1">
 
-- Implementation
+- Dynamic Programming
 
 </div>
 </details>
