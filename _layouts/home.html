@@ -4,9 +4,6 @@ layout: default
 
 {% include home-header.html %}
 
-<input type="text" id="search-input" placeholder="Search posts . . .">
-<ul id="results-container"></ul>
-
 <div class="posts">
   {% for post in paginator.posts %}
   <section class="post-entry">
