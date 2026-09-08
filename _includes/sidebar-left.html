@@ -1,43 +1,16 @@
 <header class="masthead">
-  {% include search-box.html %}
-  {% if site.avatar -%}
-    <div class="avatar">
-      {%- if site.avatar contains "://" -%}
-        {%- assign avatar = site.avatar -%}
-      {%- else -%}
-        {%- assign avatar = site.avatar | relative_url -%}
-      {%- endif -%}
-      <img src="{{ avatar }}" class="avatar-image" alt="{{ site.author.name }}">
-    </div>
-  {%- endif %}
-  <div class="masthead-title">
-    <a href="{{ "/" | relative_url }}" title="Home">{{ site.title }}</a>
-  </div>
-  <div class="masthead-tagline">
-    <small>{{ site.description }}</small>
-  </div>
-  {%- if site.data.navigation -%}
-  <nav class="navigation">
-    <ul class="navigation-list">
-    {%- for nav in site.data.navigation -%}
-      <li class="navigation-item">
-        <a onclick="sessionStorage.setItem('forceCheckScroll', 'true')" href="{{ nav.url | relative_url }}">{{ nav.title | escape }}</a>
-      </li>
-    {%- endfor -%}
-    </ul>
+  <a class="brand" href="{{ '/' | relative_url }}" aria-label="{{ site.title | escape }} 홈"><span class="brand-symbol" aria-hidden="true">o<span>.</span></span><span>{{ site.title | escape }}<small>ORBIT3230</small></span></a>
+  <p class="sidebar-description">{{ site.description | escape }}</p>
+  <nav class="navigation" aria-label="주 메뉴">
+    <span class="nav-label">EXPLORE</span>
+    <a href="{{ '/' | relative_url }}" {% if page.layout == 'home' %}aria-current="page"{% endif %}>{% include icon.html name='home' %}최근 글</a>
+    <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>{% include icon.html name='calendar' %}연도별 기록</a>
+    <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>{% include icon.html name='tag' %}태그 탐색</a>
+    <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}>{% include icon.html name='user' %}블로그 소개</a>
   </nav>
-  {%- endif -%}
-  {% if site.data.social -%}
-    <div class="social pure-menu pure-menu-horizontal">
-      <ul class="social-icons pure-menu-list">
-      {% for social in site.data.social -%}
-        <li class="pure-menu-item">
-          <a class="social-icon pure-menu-link" href="{{ social.url }}">
-            <i class="{{ social.icon | default: 'fas fa-link' }}" title="{{ social.title }}"></i>
-          </a>
-        </li>
-      {%- endfor %}
-      </ul>
-    </div>
-  {%- endif %}
+  {% include search-box.html %}
+  <div class="sidebar-bottom">
+    <div class="author-profile">{% if site.avatar %}<img src="{{ site.avatar | relative_url }}" alt="" width="38" height="38">{% endif %}<span>{{ site.author.name | escape }}<small>Computer Science Notes</small></span></div>
+    <div class="social" aria-label="연락처">{% for social in site.data.social %}<a href="{{ social.url }}" aria-label="{{ social.title }}" title="{{ social.title }}">{% if social.title == 'GitHub' %}{% include icon.html name='github' %}{% else %}{% include icon.html name='mail' %}{% endif %}</a>{% endfor %}</div>
+  </div>
 </header>

@@ -11,4 +11,4 @@ e-mail : hu0868@naver.com
 
 <br>
 
-![saa-c03](aws-certified-solutions-architect-associate.png)
+![saa-c03]({{ '/aws-certified-solutions-architect-associate.png' | relative_url }})

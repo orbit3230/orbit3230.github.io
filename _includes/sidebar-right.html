@@ -1,8 +1,7 @@
 {% if page.toc %}
-<div  class="toc-wrapper">
-  <h2 class="toc-title">Table of Contents</h2>
-    <nav class="toc-nav">
-      {% include toc.html html=content h_min=2 h_max=3 skipNoIDs=true class="toc" %}
-  </nav>
-</div>
+<details class="toc-wrapper" open>
+  <summary class="toc-title">이 글의 목차</summary>
+  <nav class="toc-nav" aria-label="이 글의 목차">{% include toc.html html=content h_min=2 h_max=3 skipNoIDs=true class="toc" %}</nav>
+  <a class="back-to-top" href="#site-main">맨 위로 ↑</a>
+</details>
 {% endif %}

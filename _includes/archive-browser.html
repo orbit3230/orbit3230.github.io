@@ -1,0 +1,31 @@
+{% assign years = site.posts | group_by_exp: 'post', "post.date | date: '%Y'" %}
+{% assign taxonomies = site.tags | sort %}
+{% if include.mode == 'categories' %}{% assign taxonomies = site.categories | sort %}{% endif %}
+<header class="archive-hero">
+  <p class="eyebrow">THE COLLECTION / {% if include.mode == 'years' %}BY YEAR{% else %}BY TOPIC{% endif %}</p>
+  <h1>{% if include.mode == 'years' %}시간을 따라 쌓인 기록{% elsif include.mode == 'categories' %}카테고리별 기록{% else %}관심 있는 주제부터{% endif %}</h1>
+  <p>{% if include.mode == 'years' %}연도를 선택하고, 그때의 배움을 다시 만나보세요.{% else %}태그를 선택하면 같은 주제의 글을 한곳에서 볼 수 있습니다.{% endif %}</p>
+</header>
+{% include home-header.html %}
+<div class="archive-browser" data-archive data-mode="{{ include.mode }}">
+  <div class="archive-tools" hidden>
+    <div class="archive-search"><label for="archive-query">기록 찾기</label><div class="search-field">{% include icon.html name='search' %}<input id="archive-query" type="search" placeholder="제목 또는 태그로 검색" aria-controls="archive-posts"></div></div>
+    <div class="year-select"><label for="archive-year">연도</label><select id="archive-year" aria-controls="archive-posts"><option value="">모든 연도</option>{% for year in years %}<option value="{{ year.name }}">{{ year.name }}년 ({{ year.size }})</option>{% endfor %}</select></div>
+  </div>
+  <div class="filter-section" hidden>
+    <div class="filter-heading"><h2>{% if include.mode == 'years' %}연도 선택{% else %}주제 선택{% endif %}</h2><button type="button" class="filter-toggle" aria-expanded="false" hidden>태그 모두 보기</button></div>
+    <div class="filter-list" role="group" aria-label="{% if include.mode == 'years' %}연도{% else %}주제{% endif %} 선택">
+      <button type="button" class="filter-chip" data-filter="" data-slug="" aria-pressed="true">전체 <span>{{ site.posts.size }}</span></button>
+      {% if include.mode == 'years' %}
+        {% for year in years %}<button type="button" class="filter-chip" data-filter="{{ year.name }}" data-slug="{{ year.name }}" aria-pressed="false">{{ year.name }} <span>{{ year.size }}</span></button>{% endfor %}
+      {% else %}
+        {% for taxonomy in taxonomies %}<button type="button" class="filter-chip" data-filter="{{ taxonomy[0] | escape }}" data-slug="{{ taxonomy[0] | slugify | escape }}" aria-pressed="false">{{ taxonomy[0] | escape }} <span>{{ taxonomy[1].size }}</span></button>{% endfor %}
+      {% endif %}
+    </div>
+  </div>
+  <noscript><p class="notice">전체 글 목록입니다. 연도·태그 필터를 사용하려면 JavaScript를 켜 주세요.</p></noscript>
+  <div class="section-heading"><h2 id="archive-selection">전체 기록</h2><span id="archive-count" role="status">{{ site.posts.size }}개의 글 · 최신순</span></div>
+  <div id="archive-posts" class="posts">{% for post in site.posts %}{% include post-card.html post=post filterable=true %}{% endfor %}</div>
+  <div class="empty-state" hidden><h2>일치하는 기록이 없습니다.</h2><p>다른 검색어를 입력하거나 선택한 필터를 초기화해 보세요.</p><button type="button" data-reset>필터 초기화</button></div>
+  <div class="load-more" hidden><button type="button" data-load-more>기록 더 보기</button><span data-load-status></span></div>
+</div>

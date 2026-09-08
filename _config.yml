@@ -14,7 +14,6 @@ plugins:
   - jekyll-seo-tag
   - jekyll-feed
   - jekyll-sitemap
-  - not-pure-poole
 
 # Optimize Jekyll
 exclude:
@@ -35,7 +34,7 @@ social:
   links:
     - https://github.com/orbit3230
 google_site_verification: xxxxx
-lang: en
+lang: ko
 
 sass:
   sass_dir: _sass

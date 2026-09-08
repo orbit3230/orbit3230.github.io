@@ -1,13 +1,5 @@
-<div class="home-header pure-menu pure-menu-horizontal">
-  <div class="home-header-bar">
-    {% if site.data.archive %}
-    <ul class="home-header-menu pure-menu-list">
-      {% for item in site.data.archive %}
-        <li class="pure-menu-item">
-          <a href="{{ item.url | relative_url }}" class="pure-menu-link {% if page.url == item.url %}current-item{% endif %}"">{{ item.title }}</a>
-        </li>
-      {% endfor %}
-    </ul>
-    {% endif %}
-  </div>
-</div>
+<nav class="home-header" aria-label="글 탐색 방식">
+  <a href="{{ '/' | relative_url }}" {% if page.layout == 'home' %}aria-current="page"{% endif %}>최근 글</a>
+  <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>연도별</a>
+  <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>태그별</a>
+</nav>
