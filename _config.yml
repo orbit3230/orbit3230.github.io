@@ -5,7 +5,6 @@ url: https://orbit3230.github.io
 avatar: /avatar.png
 paginate: 5
 permalink: pretty
-cover_image: /bg.jpeg
 
 # Gems
 plugins:
@@ -20,12 +19,13 @@ exclude:
   - .editorconfig
   - .git
   - .jekyll-cache
+  - .sass-cache
+  - .vs
   - Gemfile
   - Gemfile.lock
   - LICENSE.md
   - README.md
   - scripts/
-  - not-pure-poole.gemspec
 
 # Optimize Jekyl SEO Tag
 logo: logo.png
@@ -37,7 +37,6 @@ google_site_verification: xxxxx
 lang: ko
 
 sass:
-  sass_dir: _sass
   style: compressed
 
 # Options

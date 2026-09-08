@@ -44,3 +44,7 @@ node_modules
 
 # Ruby gems
 *.gem
+
+# Local editor state and Jekyll metadata
+.vs/
+.jekyll-metadata

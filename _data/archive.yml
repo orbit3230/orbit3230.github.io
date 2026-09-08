@@ -1,9 +1,0 @@
-- type: dates
-  title: 연도별 탐색
-  url: /dates/
-#- type: categories
-#  title: Categories
-#  url: /categories/
-- type: tags
-  title: 태그별 탐색
-  url: /tags/

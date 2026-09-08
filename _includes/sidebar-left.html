@@ -3,10 +3,10 @@
   <p class="sidebar-description">{{ site.description | escape }}</p>
   <nav class="navigation" aria-label="주 메뉴">
     <span class="nav-label">EXPLORE</span>
-    <a href="{{ '/' | relative_url }}" {% if page.layout == 'home' %}aria-current="page"{% endif %}>{% include icon.html name='home' %}최근 글</a>
-    <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>{% include icon.html name='calendar' %}연도별 탐색</a>
-    <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>{% include icon.html name='tag' %}태그별 탐색</a>
-    <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}>{% include icon.html name='user' %}블로그 소개</a>
+    <a href="{{ '/' | relative_url }}" {% if page.layout == 'home' %}aria-current="page"{% endif %}>{% include icon.html name='home' %}<span class="nav-text"><span>최근</span> <span>글</span></span></a>
+    <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>{% include icon.html name='calendar' %}<span class="nav-text"><span>연도별</span> <span>탐색</span></span></a>
+    <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>{% include icon.html name='tag' %}<span class="nav-text"><span>태그별</span> <span>탐색</span></span></a>
+    <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}>{% include icon.html name='user' %}<span class="nav-text"><span>블로그</span> <span>소개</span></span></a>
   </nav>
   {% include search-box.html %}
   <div class="sidebar-bottom">
