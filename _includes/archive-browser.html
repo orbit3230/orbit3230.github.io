@@ -3,8 +3,8 @@
 {% if include.mode == 'categories' %}{% assign taxonomies = site.categories | sort %}{% endif %}
 <header class="archive-hero">
   <p class="eyebrow">THE COLLECTION / {% if include.mode == 'years' %}BY YEAR{% else %}BY TOPIC{% endif %}</p>
-  <h1>{% if include.mode == 'years' %}시간을 따라 쌓인 기록{% elsif include.mode == 'categories' %}카테고리별 기록{% else %}관심 있는 주제부터{% endif %}</h1>
-  <p>{% if include.mode == 'years' %}연도를 선택하고, 그때의 배움을 다시 만나보세요.{% else %}태그를 선택하면 같은 주제의 글을 한곳에서 볼 수 있습니다.{% endif %}</p>
+  <h1>{% if include.mode == 'years' %}Search by Year{% elsif include.mode == 'categories' %}카테고리별 기록{% else %}Search by Tag{% endif %}</h1>
+  <p>{% if include.mode == 'years' %}연도별 포스트를 확인하세요.{% else %}태그별 포스트를 확인하세요.{% endif %}</p>
 </header>
 {% include home-header.html %}
 <div class="archive-browser" data-archive data-mode="{{ include.mode }}">
@@ -24,8 +24,8 @@
     </div>
   </div>
   <noscript><p class="notice">전체 글 목록입니다. 연도·태그 필터를 사용하려면 JavaScript를 켜 주세요.</p></noscript>
-  <div class="section-heading"><h2 id="archive-selection">전체 기록</h2><span id="archive-count" role="status">{{ site.posts.size }}개의 글 · 최신순</span></div>
+  <div class="section-heading" data-list-heading tabindex="-1"><h2 id="archive-selection">전체 기록</h2>{% include list-options.html %}</div>
   <div id="archive-posts" class="posts">{% for post in site.posts %}{% include post-card.html post=post filterable=true %}{% endfor %}</div>
   <div class="empty-state" hidden><h2>일치하는 기록이 없습니다.</h2><p>다른 검색어를 입력하거나 선택한 필터를 초기화해 보세요.</p><button type="button" data-reset>필터 초기화</button></div>
-  <div class="load-more" hidden><button type="button" data-load-more>기록 더 보기</button><span data-load-status></span></div>
+  {% include list-pagination.html %}
 </div>

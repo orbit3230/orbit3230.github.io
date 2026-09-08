@@ -1,0 +1,13 @@
+<nav class="listing-pagination" aria-label="글 목록 페이지" hidden>
+  <div class="page-links">
+    <a data-page-step="first" aria-label="첫 페이지">«</a>
+    <a data-page-step="previous" aria-label="이전 페이지">이전</a>
+    <span class="page-numbers" data-page-numbers></span>
+    <a data-page-step="next" aria-label="다음 페이지">다음</a>
+    <a data-page-step="last" aria-label="마지막 페이지">»</a>
+  </div>
+  <div class="page-jump-row">
+    <span data-page-status role="status"></span>
+    <form class="page-jump"><label for="jump-page">페이지 바로 이동</label><input id="jump-page" type="number" min="1" step="1" required inputmode="numeric" aria-label="이동할 페이지 번호" aria-controls="archive-posts"><button type="submit">이동</button></form>
+  </div>
+</nav>

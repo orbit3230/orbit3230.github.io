@@ -1,5 +1,5 @@
 <nav class="home-header" aria-label="글 탐색 방식">
   <a href="{{ '/' | relative_url }}" {% if page.layout == 'home' %}aria-current="page"{% endif %}>최근 글</a>
-  <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>연도별</a>
-  <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>태그별</a>
+  <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>연도별 탐색</a>
+  <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>태그별 탐색</a>
 </nav>

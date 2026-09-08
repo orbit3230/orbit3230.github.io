@@ -1,11 +1,11 @@
 <header class="masthead">
-  <a class="brand" href="{{ '/' | relative_url }}" aria-label="{{ site.title | escape }} 홈"><span class="brand-symbol" aria-hidden="true">o<span>.</span></span><span>{{ site.title | escape }}<small>ORBIT3230</small></span></a>
+  <a class="brand" href="{{ '/' | relative_url }}" aria-label="{{ site.title | escape }} 홈"><img class="brand-image" src="{{ "/assets/pogohead.png" | relative_url }}" alt="" width="42" height="42"><span>{{ site.title | escape }}<small>ORBIT3230</small></span></a>
   <p class="sidebar-description">{{ site.description | escape }}</p>
   <nav class="navigation" aria-label="주 메뉴">
     <span class="nav-label">EXPLORE</span>
     <a href="{{ '/' | relative_url }}" {% if page.layout == 'home' %}aria-current="page"{% endif %}>{% include icon.html name='home' %}최근 글</a>
-    <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>{% include icon.html name='calendar' %}연도별 기록</a>
-    <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>{% include icon.html name='tag' %}태그 탐색</a>
+    <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>{% include icon.html name='calendar' %}연도별 탐색</a>
+    <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>{% include icon.html name='tag' %}태그별 탐색</a>
     <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}>{% include icon.html name='user' %}블로그 소개</a>
   </nav>
   {% include search-box.html %}
