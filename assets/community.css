@@ -64,3 +64,51 @@
 .comment-submit-row button { flex-shrink: 0; min-height: 44px; padding: 10px 24px; border: 1px solid #365a49; border-radius: 7px; background: var(--accent-bg); color: var(--accent); }
 .comment-meta strong { color: var(--accent); }
 .comment-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }
+.community-panel { min-width: 0; margin-top: 24px; color: var(--text); }
+.activity-widget, .inbox-widget { padding: 12px; border: 1px solid var(--border); border-radius: 10px; background: var(--surface); }
+.community-heading { display: flex; align-items: center; justify-content: space-between; gap: 6px; }
+.community-heading h2 { margin: 0; font-size: 12px; line-height: 1.6; letter-spacing: -.03em; }
+.community-panel button { background: var(--bg); border: 1px solid var(--border); border-radius: 5px; color: var(--muted); padding: 6px 8px; font: inherit; font-size: 10px; cursor: pointer; }
+.community-panel button:disabled { opacity: .4; cursor: default; }
+.community-panel button:hover:enabled { color: var(--accent); border-color: var(--accent); }
+.community-status, .community-help { margin: 9px 0; color: var(--muted); font-size: 10px; line-height: 1.8; word-break: keep-all; overflow-wrap: anywhere; }
+.activity-list, .inbox-list { list-style: none; padding: 0; margin: 0; }
+.activity-list li, .inbox-list li { padding: 11px 0; border-bottom: 1px solid var(--border); }
+.activity-list a, .inbox-list a { display: block; color: var(--text); font-size: 12px; line-height: 1.7; overflow-wrap: anywhere; }
+.activity-list a:hover, .inbox-list a:hover { color: var(--accent); }
+.activity-list small, .inbox-list small { display: block; margin-top: 5px; color: var(--muted); font-size: 9px; line-height: 1.8; overflow-wrap: anywhere; }
+.community-pager { display: flex; align-items: center; justify-content: space-between; gap: 5px; margin-top: 12px; font-size: 10px; color: var(--muted); }
+.inbox-widget { margin-top: 12px; }
+.inbox-widget summary { cursor: pointer; font-size: 12px; line-height: 1.8; }
+.inbox-badge { display: inline-block; padding: 0 6px; margin-left: 5px; border-radius: 9px; background: var(--bg); color: var(--muted); font-size: 10px; }
+.inbox-badge.has-unread { background: var(--accent-bg); color: var(--accent); }
+.inbox-actions { display: flex; gap: 6px; flex-wrap: wrap; }
+.inbox-list .is-unread a { color: var(--accent); }
+.inbox-list p { font-size: 11px; color: var(--muted); margin: 6px 0 0; overflow-wrap: anywhere; line-height: 1.7; }
+.community-footer { max-width: 900px; margin: 0 auto; padding: 0 22px 26px; }
+.community-footer:not(:has(.community-panel)) { display: none; }
+.comment-password-help { color: var(--muted); font-size: 11px; line-height: 1.8; margin: 0 0 6px; }
+.comment-entry { min-width: 0; scroll-margin-top: 30px; }
+.comment-entry:target > .comment-card { border-color: var(--accent); box-shadow: 0 0 0 1px var(--accent-bg); }
+.comment-card-actions { display: flex; flex-wrap: wrap; gap: 8px; margin-top: 15px; }
+.comment-card-actions button, .comment-inline > button, .comment-replies > button { border: 1px solid var(--border); background: var(--bg); color: var(--muted); border-radius: 6px; padding: 7px 11px; font: inherit; font-size: 11px; cursor: pointer; }
+.comment-card-actions button:hover, .comment-inline > button:hover { border-color: var(--accent); color: var(--accent); }
+.comment-replies { margin: 12px 0 0 18px; padding-left: 14px; border-left: 2px solid var(--border); }
+.reply-list { display: grid; gap: 10px; margin: 10px 0; }
+.reply-target { color: var(--accent); font-size: 11px; margin: 10px 0 0; }
+.comment-inline { border-top: 1px solid var(--border); padding-top: 14px; margin-top: 16px; }
+.comment-inline > p { font-size: 12px; color: var(--muted); }
+.comment-inline .comment-form > button { min-height: 42px; padding: 9px 16px; border: 1px solid #365a49; border-radius: 6px; background: var(--accent-bg); color: var(--accent); justify-self: start; }
+.comment-card.is-deleted .comment-body { color: var(--muted); font-size: 12px; }
+.comment-form button:focus-visible, .community-panel button:focus-visible, .comment-card-actions button:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+@media(max-width:760px) {
+  .community-panel { margin-top: 12px; }
+  .activity-widget, .inbox-widget { padding: 16px; }
+  .community-heading h2, .inbox-widget summary { font-size: 14px; }
+  .activity-list a, .inbox-list a { font-size: 13px; }
+  .community-status, .community-help, .activity-list small, .inbox-list small { font-size: 11px; }
+  .community-panel button, .comment-card-actions button { min-height: 40px; font-size: 12px; }
+  .comment-replies { margin-left: 6px; padding-left: 9px; }
+  .comment-replies .comment-card { padding: 14px; }
+}
+@media print { .community-panel, .community-footer { display: none; } }

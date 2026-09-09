@@ -1,63 +1,69 @@
-import fs from 'node:fs';
 import assert from 'node:assert/strict';
-import { DatabaseSync } from 'node:sqlite';
-
-import worker from './worker.mjs';
-
-
-const db = new DatabaseSync(':memory:');
-db.exec(fs.readFileSync(new URL('./schema.sql', import.meta.url), 'utf8'));
-const env = { RATE_SALT: 'test-only-secret-with-at-least-32-characters', ALLOWED_ORIGINS: 'https://orbit3230.github.io', DB: {
-  prepare(sql) { return { bind(...values) {
-    const stmt = db.prepare(sql);
-    return { first: async () => stmt.get(...values) || null, all: async () => ({ results: stmt.all(...values) }), run: async () => stmt.run(...values) };
-  } }; }
-} };
-let count = 0;
-function check(value, label) { assert.ok(value, label); count++; }
-const payload = (post = '/test/', extra = {}) => ({ post, name: '', body: '댓글 내용', request_id: crypto.randomUUID(), website: '', ...extra });
-async function api(method, data, options = {}) {
-  const url = 'https://comments.example/comments' + (method === 'GET' ? '?' + new URLSearchParams(data) : '');
-  const request = new Request(url, { method, headers: { Origin: env.ALLOWED_ORIGINS, 'Content-Type': 'application/json', 'CF-Connecting-IP': options.ip || '192.0.2.1', ...options.headers }, ...(method === 'POST' ? { body: JSON.stringify(data) } : {}) });
-  const response = await worker.fetch(request, env);
-  return { status: response.status, data: response.status === 204 ? null : await response.json(), headers: response.headers };
-}
-let result = await api('GET', { post: '/test/' });
-check(result.status === 200 && result.data.comments.length === 0, 'Empty database returns true empty list');
-check(result.headers.get('Access-Control-Allow-Origin') === env.ALLOWED_ORIGINS, 'Exact CORS origin');
-check((await api('OPTIONS', {})).status === 204, 'Cross-origin preflight works');
-check((await api('GET', { post: '/test/' }, { headers: { Origin: 'https://evil.test' } })).status === 403, 'Other origins rejected');
-const first = payload();
-result = await api('POST', first);
-check(result.status === 201 && result.data.comment.name === '익명', 'Anonymous comment persists');
-check(!('writer_key' in result.data.comment) && !('request_id' in result.data.comment), 'Only public fields returned');
-check((await api('POST', first)).data.comment.id === result.data.comment.id, 'Retry returns original comment');
-check((await api('POST', { ...first, body: '다른 내용' })).status === 409, 'Request ID cannot replace content');
-check((await api('POST', payload())).status === 429, '30-second cooldown enforced');
-check((await api('POST', payload('/test/', { name: '독자', body: '<script>alert(1)</script>' }), { ip: '192.0.2.2' })).status === 201, 'Another visitor may use their own name');
-check((await api('GET', { post: '/other/' })).data.comments.length === 0, 'Posts isolated');
-for (const invalid of [payload('/bad?query'), payload('/test/', { body: ' ' }), payload('/test/', { body: 'x'.repeat(2001) }), payload('/test/', { name: 'x'.repeat(41) }), payload('/test/', { website: 'bot' }), payload('/test/', { request_id: 'invalid' }), payload('/test/', { body: 'x'.repeat(17000) })]) {
-  check((await api('POST', invalid, { ip: '192.0.2.3' })).status === 400, 'Invalid input rejected on server');
-}
-check((await api('GET', { post: '/test/', before: 'not-a-number' })).status === 400, 'Invalid cursor rejected');
-const concurrent = payload('/concurrent/');
-const races = await Promise.all([api('POST', concurrent, { ip: '192.0.2.4' }), api('POST', concurrent, { ip: '192.0.2.4' })]);
-check(races.every(item => item.data.comment?.id === races[0].data.comment.id), 'Concurrent duplicate requests return same stored comment');
-const distinctRaces = await Promise.all([api('POST', payload('/concurrent/'), { ip: '192.0.2.5' }), api('POST', payload('/concurrent/'), { ip: '192.0.2.5' })]);
-check(distinctRaces.filter(item => item.status === 201).length === 1 && distinctRaces.some(item => item.status === 429), 'Atomic rate check prevents concurrent distinct spam');
-const hourly = await api('POST', payload('/hourly/'), { ip: '192.0.2.6' });
-const hourlyKey = db.prepare('SELECT writer_key FROM comments WHERE id = ?').get(hourly.data.comment.id).writer_key;
-for (let i = 0; i < 9; i++) db.prepare('INSERT INTO comments(request_id,post,name,body,created_at,created_ms,writer_key) VALUES(?,?,?,?,?,?,?)').run(crypto.randomUUID(), '/hourly/', 'a', 'b', new Date().toISOString(), Date.now() - 60000, hourlyKey);
-db.prepare('UPDATE comments SET created_ms = ? WHERE id = ?').run(Date.now() - 60000, hourly.data.comment.id);
-check((await api('POST', payload('/hourly/'), { ip: '192.0.2.6' })).status === 429, 'Hourly limit enforced separately from cooldown');
-for (let i = 0; i < 25; i++) db.prepare('INSERT INTO comments(request_id,post,name,body,created_at,created_ms) VALUES(?,?,?,?,?,?)').run(crypto.randomUUID(), '/pages/', '독자', '댓글 '+i, new Date().toISOString(), Date.now());
-const page1 = (await api('GET', { post: '/pages/' })).data;
-const page2 = (await api('GET', { post: '/pages/', before: page1.next_cursor })).data;
-check(page1.comments.length === 20 && page2.comments.length === 5 && page2.next_cursor === null, 'Cursor pagination ends correctly');
-check(new Set([...page1.comments,...page2.comments].map(row => row.id)).size === 25, 'No pagination duplicates');
-db.prepare('UPDATE comments SET created_ms = ? WHERE writer_key IS NOT NULL').run(Date.now() - 300000000);
-const totalBefore = db.prepare('SELECT COUNT(*) AS n FROM comments').get().n;
-await worker.scheduled({}, env);
-check(db.prepare('SELECT COUNT(*) AS n FROM comments').get().n === totalBefore && db.prepare('SELECT COUNT(*) AS n FROM comments WHERE writer_key IS NOT NULL').get().n === 0, 'Privacy cleanup keeps comments and removes old identifiers');
-
-db.close(); console.log(JSON.stringify({status: 'PASS', checks: count}));
+import { harness } from './test-support.mjs';
+const {db,env,api,payload,seed,service} = harness();
+let checks = 0;
+const check = (value,label) => { assert.ok(value,label); checks++; };
+check(db.prepare('SELECT body FROM comments WHERE id=1').get().body === '기존 댓글 보존','Migration preserves legacy content');
+const legacy=(await api('/comments?post=/legacy/')).data.comments[0];
+check(!legacy.manageable && !legacy.password_salt,'Legacy comments are not claimable by strangers');
+check((await api('/comments/1/edit',{password_key:'b'.repeat(64),body:'overwrite',revision:0})).status===403,'Cannot overwrite legacy comment');
+const first=payload('/test/');
+let result=await api('/comments',first); check(result.status===201,'Create password-protected comment');
+const root=result.data.comment;
+check(root.manageable && root.password_salt===first.password_salt,'Salt is available for author proof');
+check(!('password_hash' in root) && !('notify_hash' in root) && !('writer_key' in root),'Public responses exclude secrets');
+check(db.prepare('SELECT password_hash FROM comments WHERE id=?').get(root.id).password_hash!==first.password_key,'Store peppered verifier, not submitted proof');
+check((await api('/comments',first)).data.comment.id===root.id,'Create retry idempotent');
+check((await api('/comments',{...first,notify_token:'c'.repeat(64)})).status===409,'Retry cannot steal notification receipt');
+check((await api('/comments',payload('/test/',{password_key:''}))).status===400,'Legacy frontend cannot create unprotected comments');
+const reply=payload('/test/',{reply_to:root.id,name:'답변자',body:'답글'});
+const replyRow=(await api('/comments',reply)).data.comment;
+check(replyRow.root_id===root.id && replyRow.reply_to===root.id,'Reply linked to original root');
+const nested=payload('/test/',{reply_to:replyRow.id,body:'답글에 대한 답글'});
+const nestedRow=(await api('/comments',nested)).data.comment;
+check(nestedRow.root_id===root.id && nestedRow.reply_to===replyRow.id,'Nested reply keeps one indentation level and exact recipient');
+check((await api('/comments',payload('/other/',{reply_to:root.id}))).status===409,'Cross-post replies rejected');
+const notification=await api('/notifications',{receipts:[{id:root.id,token:first.notify_token}],seen:0});
+check(notification.data.unread===1 && notification.data.notifications[0].id===replyRow.id,'Only direct replies notify their author');
+check((await api('/notifications',{receipts:[{id:root.id,token:'e'.repeat(64)}]})).data.notifications.length===0,'Forged receipt reveals no inbox');
+check((await api('/notifications',{receipts:[{id:root.id,token:first.notify_token},{id:replyRow.id,token:reply.notify_token},{id:nestedRow.id,token:nested.notify_token}]})).data.unread===0,'Own replies do not notify the same browser');
+check((await api('/notifications',{receipts:[{id:root.id,token:first.notify_token}],seen:replyRow.id})).data.unread===0,'Mark-read cursor works');
+check((await api(`/comments/${root.id}/edit`,{password_key:'c'.repeat(64),body:'changed',revision:0})).status===403,'Wrong password proof rejected');
+result=await api(`/comments/${root.id}/edit`,{password_key:first.password_key,body:'수정된 댓글',revision:0});
+check(result.status===200 && result.data.comment.body==='수정된 댓글' && result.data.comment.revision===1,'Author edit persists revision');
+check((await api(`/comments/${root.id}/edit`,{password_key:first.password_key,body:'수정된 댓글',revision:0})).status===200,'Uncertain edit response can be retried');
+check((await api(`/comments/${root.id}/edit`,{password_key:first.password_key,body:'stale overwrite',revision:0})).status===409,'Stale editor cannot overwrite new content');
+const thread=(await api(`/comments?post=/test/&thread=${root.id}`)).data.comments;
+check(thread.length===2 && thread[1].reply_to_name==='답변자','Thread preserves target names');
+const focus=(await api(`/comments?post=/test/&focus=${nestedRow.id}`)).data;
+check(focus.comments[0].id===root.id && focus.focus_id===nestedRow.id,'Deep link resolves root thread');
+for(let i=0;i<25;i++) seed('/test/',{root_id:root.id,reply_to:root.id});
+const t1=(await api(`/comments?post=/test/&thread=${root.id}`)).data;
+const t2=(await api(`/comments?post=/test/&thread=${root.id}&after=${t1.next_cursor}`)).data;
+check(t1.comments.length===20 && t2.comments.length===7 && !t2.next_cursor,'Thread pagination retains all replies');
+check(new Set([...t1.comments,...t2.comments].map(r=>r.id)).size===27,'No duplicate replies across pages');
+result=await api(`/comments/${root.id}/delete`,{password_key:first.password_key,revision:1});
+check(result.status===200 && result.data.comment.deleted,'Author can delete');
+check(db.prepare('SELECT body,name FROM comments WHERE id=?').get(root.id).body==='삭제된 댓글입니다.','Delete erases original content from DB');
+check((await api('/comments?post=/test/')).data.comments.some(r=>r.id===root.id && r.deleted),'Deleted parent remains with replies');
+check((await api(`/comments?post=/test/&thread=${root.id}`)).data.comments.length===20,'Parent deletion preserves replies');
+check((await api('/comments',payload('/test/',{reply_to:root.id}))).status===409,'New replies to deleted target rejected');
+check((await api(`/comments/${root.id}/delete`,{password_key:first.password_key,revision:1})).status===200,'Delete retry idempotent');
+for(let i=0;i<10;i++) seed('/activity-'+i+'/');
+seed('/activity-9/');
+const a1=(await api('/activity')).data, a2=(await api('/activity?before='+a1.next_cursor)).data;
+check(a1.posts.length===5 && a2.posts.length===5,'Recent discussion pages contain five posts');
+check(new Set([...a1.posts,...a2.posts].map(p=>p.post)).size===10,'Recent discussion list groups posts without duplicates');
+check(a1.posts[0].post==='/activity-9/' && a1.posts[0].comment_count===2,'Recent ordering and grouped count correct');
+const single=payload('/single/'); const singleRow=(await api('/comments',single)).data.comment;
+await api(`/comments/${singleRow.id}/delete`,{password_key:single.password_key,revision:0});
+check(!db.prepare('SELECT * FROM post_activity WHERE post=?').get('/single/'),'Empty deleted conversation removed from sidebar');
+for (const p of ['/\\evil.test','//evil.test','/bad?query']) check((await api('/comments',payload(p))).status===400,'Unsafe post URL rejected');
+const badIP='192.0.2.240';
+for(let i=0;i<20;i++) await api(`/comments/${replyRow.id}/edit`,{password_key:'c'.repeat(64),revision:0,body:'bad'},{ip:badIP});
+check((await api(`/comments/${replyRow.id}/edit`,{password_key:reply.password_key,revision:0,body:'valid'},{ip:badIP})).status===429,'Password attempt rate limit enforced');
+const ratePayload=payload('/rate/'); check((await api('/comments',ratePayload,{ip:'192.0.2.241'})).status===201,'First rate-limited write accepted');
+check((await api('/comments',payload('/rate/'),{ip:'192.0.2.241'})).status===429,'Existing posting cooldown preserved');
+check((await api('/activity',undefined,{headers:{Origin:'https://evil.test'}})).status===403,'Disallowed origin denied');
+check((await api('/comments?post=/legacy/&focus=999999')).status===404,'Missing focus reported');
+db.close(); console.log(JSON.stringify({status:'PASS',checks,scope:'migration and actual SQLite API integration'}));

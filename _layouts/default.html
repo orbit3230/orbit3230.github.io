@@ -8,8 +8,10 @@
       <div class="content" id="site-main" tabindex="-1">{% include content.html %}</div>
       {% if page.toc or site.media.enabled %}<aside class="sidebar-right"><div class="sidebar-widgets">{% if site.media.enabled %}{% include media-player.html %}{% endif %}{% include sidebar-right.html %}</div></aside>{% endif %}
     </div>
+    <div class="community-footer" data-community-footer-slot>{% include community-sidebar.html %}</div>
     <script src="{{ '/assets/site.js' | relative_url }}" defer></script>
     {% if site.media.enabled or site.comments.enabled %}<script src="{{ '/assets/community.js' | relative_url }}" defer></script>{% endif %}
+    {% if site.comments.enabled %}<script src="{{ '/assets/comments.js' | relative_url }}" defer></script>{% endif %}
     {% if page.math %}{% include mathjax.html %}{% endif %}
     {% if jekyll.environment == 'production' and site.google_analytics %}{% include google-analytics.html %}{% endif %}
   </body>

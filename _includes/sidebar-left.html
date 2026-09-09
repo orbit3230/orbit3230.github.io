@@ -9,6 +9,7 @@
     <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}>{% include icon.html name='user' %}<span class="nav-text"><span>블로그</span> <span>소개</span></span></a>
   </nav>
   {% include search-box.html %}
+  <div data-community-sidebar-slot></div>
   <div class="sidebar-bottom">
     <div class="author-profile">{% if site.avatar %}<img src="{{ site.avatar | relative_url }}" alt="" width="38" height="38">{% endif %}<span>{{ site.author.name | escape }}<small>Computer Science Notes</small></span></div>
     <div class="social" aria-label="연락처">{% for social in site.data.social %}<a href="{{ social.url }}" aria-label="{{ social.title }}" title="{{ social.title }}">{% if social.title == 'GitHub' %}{% include icon.html name='github' %}{% else %}{% include icon.html name='mail' %}{% endif %}</a>{% endfor %}</div>

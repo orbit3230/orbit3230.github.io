@@ -6,6 +6,9 @@
   <form class="comment-form" data-comment-form>
     <label for="comment-name">이름 <span>(선택)</span></label>
     <input id="comment-name" name="name" maxlength="40" placeholder="익명" autocomplete="nickname">
+    <label for="comment-password">수정·삭제 비밀번호</label>
+    <input id="comment-password" name="password" type="password" required minlength="8" maxlength="128" autocomplete="new-password" placeholder="8자 이상" aria-describedby="comment-password-help">
+    <p class="comment-password-help" id="comment-password-help">계정 가입 없이 댓글을 관리하는 비밀번호입니다. 잊어버리면 수정·삭제할 수 없습니다.</p>
     <label for="comment-body">댓글</label>
     <textarea id="comment-body" name="body" required maxlength="2000" rows="4" placeholder="의견을 남겨 주세요." aria-describedby="comment-help"></textarea>
     <div class="comment-trap" aria-hidden="true"><label for="comment-website">Website</label><input id="comment-website" name="website" tabindex="-1" autocomplete="off"></div>
