@@ -107,6 +107,16 @@ GitHub Pages 배포 설정은 저장소의 **Settings → Pages**에서 관리�
 
 참고: [YouTube 임베드 문서](https://developers.google.com/youtube/player_parameters), [영상·재생목록 삽입 안내](https://support.google.com/youtube/answer/171780?hl=ko).
 
+### YouTube 로그인 계정 사용
+
+플레이어의 **YouTube에서 계정으로 이용** 또는 **YouTube Music에서 계정으로 이용**을 누르면 해당 공식 서비스를 새 탭으로 엽니다. 유효한 공유 링크를 입력했다면 해당 영상·곡·재생목록으로 이동하고, 링크가 없으면 서비스 홈을 엽니다. 중복 재생을 방지하기 위해 블로그 내 재생은 종료합니다.
+
+새 탭은 같은 브라우저 프로필에서 서비스의 기존 로그인 세션을 사용합니다. Chrome 로그인 설정, 시크릿 모드, 서비스 로그아웃 상태 등에 따라 다시 로그인해야 할 수 있습니다. 여러 계정이 있다면 공식 서비스의 프로필 메뉴에서 계정을 선택합니다.
+
+블로그는 Chrome 계정 정보를 읽거나 로그인 계정을 강제로 지정하지 않습니다. 이 버튼은 **공식 서비스에서 계정을 이용하는 기능**이며, 블로그 임베드에 로그인 상태나 Premium 권한을 연결하는 기능이 아닙니다. YouTube Data API의 OAuth 인증을 추가해도 임베드 재생 계정을 지정하는 공식 인터페이스는 제공되지 않습니다. 계정 토큰이나 비밀번호는 블로그에 저장하지 않습니다.
+
+참고: [Chrome과 Google 서비스 로그인](https://support.google.com/chrome/answer/13948160?hl=ko), [YouTube 임베드 지원 옵션](https://developers.google.com/youtube/player_parameters).
+
 ## 댓글과 의견
 
 각 포스트 하단에 GitHub Issues 기반의 댓글 패널을 표시합니다. **댓글 불러오기**로 기존 대화를 읽고, **첫 의견 남기기** 또는 **GitHub에서 댓글 쓰기**로 GitHub에 로그인해 작성합니다. 댓글 작성 자체는 GitHub 새 탭에서 이루어집니다.

@@ -11,6 +11,9 @@
 .media-modes [aria-pressed='true'] { color: var(--accent); border-color: #365a49; background: var(--accent-bg); }
 .media-description, .media-status, .media-help, .media-privacy { margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.8; word-break: keep-all; }
 .media-form { display: grid; gap: 8px; margin-top: 15px; }
+.media-account { margin-top: 13px; padding: 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
+.media-account a { display: inline-block; color: var(--accent); font-size: 11px; line-height: 1.8; }
+.media-account p { margin: 7px 0 0; color: var(--muted); font-size: 10px; line-height: 1.8; word-break: keep-all; }
 .media-form label { color: var(--muted); font-size: 10px; }
 .media-form input { width: 100%; min-width: 0; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 9px 10px; font-size: 11px; }
 .media-form button, .comments-actions button, .comments-more { border: 1px solid #365a49; background: var(--accent-bg); color: var(--accent); padding: 9px 12px; font-size: 11px; border-radius: 7px; }

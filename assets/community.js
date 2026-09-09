@@ -9,6 +9,7 @@
     const status = media.querySelector('[data-media-status], #media-status');
     const frame = media.querySelector('[data-media-frame]');
     const original = media.querySelector('[data-media-original]');
+    const account = media.querySelector('[data-media-account]');
     const stop = media.querySelector('[data-media-stop]');
     const buttons = [...media.querySelectorAll('[data-media-mode]')];
     const storageKey = 'orbit-media-links-v1';
@@ -33,6 +34,7 @@
       input.placeholder = mode === 'music' ? 'https://music.youtube.com/watch?v=…' : 'https://www.youtube.com/watch?v=…';
       description.textContent = mode === 'music' ? 'YouTube Music의 공개 곡·재생목록을 YouTube 플레이어로 재생합니다.' : '보고 싶은 영상이나 재생목록의 공유 링크를 붙여 넣으세요.';
       status.textContent = '링크를 불러온 뒤 플레이어의 재생 버튼을 눌러 주세요.';
+      updateAccountLink();
       save();
     }
     function parseLink(value) {
@@ -63,11 +65,22 @@
       if (playlist) source.searchParams.set('list',playlist);
       return { embed, source };
     }
+    function updateAccountLink() {
+      account.textContent = state.mode === 'music' ? 'YouTube Music에서 계정으로 이용 ↗' : 'YouTube에서 계정으로 이용 ↗';
+      account.href = state.mode === 'music' ? 'https://music.youtube.com/' : 'https://www.youtube.com/';
+      if (input.value.trim()) {
+        try { account.href = parseLink(input.value.trim()).source.href; } catch { /* Invalid links never leave the trusted service homepage. */ }
+      }
+    }
     input.value = state[state.mode];
     select(state.mode);
     media.open = matchMedia('(min-width: 1201px)').matches;
     buttons.forEach(button => button.addEventListener('click', () => { if (button.dataset.mediaMode !== state.mode) select(button.dataset.mediaMode); }));
-    input.addEventListener('input', () => input.setCustomValidity(''));
+    input.addEventListener('input', () => { input.setCustomValidity(''); updateAccountLink(); });
+    [account, original].forEach(link => link.addEventListener('click', () => {
+      state[state.mode] = input.value.trim(); save();
+      endPlayback('원본 서비스를 열었습니다. 계정 선택과 로그인은 열린 서비스에서 진행해 주세요.');
+    }));
     form.addEventListener('submit', event => {
       event.preventDefault();
       try {
