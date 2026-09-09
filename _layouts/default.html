@@ -3,12 +3,13 @@
   {% include head.html %}
   <body>
     <a class="skip-link" href="#site-main">본문으로 건너뛰기</a>
-    <div class="site-shell{% if page.toc %} has-toc{% endif %}">
+    <div class="site-shell{% if page.toc %} has-toc{% endif %}{% if site.media.enabled %} has-widgets{% endif %}">
       <aside class="sidebar-left">{% include sidebar-left.html %}</aside>
       <div class="content" id="site-main" tabindex="-1">{% include content.html %}</div>
-      {% if page.toc %}<aside class="sidebar-right">{% include sidebar-right.html %}</aside>{% endif %}
+      {% if page.toc or site.media.enabled %}<aside class="sidebar-right"><div class="sidebar-widgets">{% if site.media.enabled %}{% include media-player.html %}{% endif %}{% include sidebar-right.html %}</div></aside>{% endif %}
     </div>
     <script src="{{ '/assets/site.js' | relative_url }}" defer></script>
+    {% if site.media.enabled or site.comments.enabled %}<script src="{{ '/assets/community.js' | relative_url }}" defer></script>{% endif %}
     {% if page.math %}{% include mathjax.html %}{% endif %}
     {% if jekyll.environment == 'production' and site.google_analytics %}{% include google-analytics.html %}{% endif %}
   </body>

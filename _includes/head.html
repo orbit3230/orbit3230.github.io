@@ -2,6 +2,7 @@
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
   <link rel="stylesheet" href="{{ 'assets/styles.css' | relative_url }}">
+  {% if site.media.enabled or site.comments.enabled %}<link rel="stylesheet" href="{{ '/assets/community.css' | relative_url }}">{% endif %}
 
   {%- seo -%}
   {%- feed_meta -%}

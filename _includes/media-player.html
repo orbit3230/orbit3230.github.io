@@ -1,0 +1,14 @@
+<details class="media-widget" data-media data-video="{{ site.media.video_url | default: '' | escape }}" data-music="{{ site.media.music_url | default: '' | escape }}">
+  <summary><span>영상 &amp; 음악</span><span class="media-summary-hint">YouTube</span></summary>
+  <div class="media-body">
+    <div class="media-modes" role="group" aria-label="재생 서비스 선택"><button type="button" data-media-mode="video" aria-pressed="true">YouTube</button><button type="button" data-media-mode="music" aria-pressed="false">YouTube Music</button></div>
+    <p class="media-description" data-media-description>보고 싶은 영상이나 재생목록의 공유 링크를 붙여 넣으세요.</p>
+    <form class="media-form"><label for="media-url">영상 링크</label><input id="media-url" type="url" inputmode="url" required placeholder="https://www.youtube.com/watch?v=…" autocomplete="off" aria-describedby="media-status"><button type="submit">플레이어 불러오기</button></form>
+    <p class="media-status" id="media-status" role="status">링크를 불러온 뒤 플레이어의 재생 버튼을 눌러 주세요.</p>
+    <div class="media-frame" data-media-frame hidden></div>
+    <div class="media-actions"><button type="button" data-media-stop hidden>재생 종료</button><a data-media-original target="_blank" rel="noopener noreferrer" hidden>원본에서 열기 ↗</a></div>
+    <p class="media-help">일부 곡·영상은 외부 재생이 제한됩니다. 글을 이동하면 재생이 종료됩니다.</p>
+    <p class="media-privacy">불러오기를 누르면 YouTube에 연결됩니다. <a href="https://www.youtube.com/t/terms" target="_blank" rel="noopener noreferrer">이용약관</a> · <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">개인정보처리방침</a></p>
+    <noscript><p>YouTube 링크를 재생하려면 JavaScript를 켜 주세요.</p></noscript>
+  </div>
+</details>

@@ -54,3 +54,14 @@ author:
   email: hu0868@naver.com
 
 future: true  
+
+# Optional media sidebar. Shared links can be pasted by each visitor.
+media:
+  enabled: true
+  video_url: ""
+  music_url: ""
+
+# Public GitHub Issues store one discussion per post URL.
+comments:
+  enabled: true
+  repo: orbit3230/orbit3230.github.io
