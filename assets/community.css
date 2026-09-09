@@ -11,9 +11,6 @@
 .media-modes [aria-pressed='true'] { color: var(--accent); border-color: #365a49; background: var(--accent-bg); }
 .media-description, .media-status, .media-help, .media-privacy { margin: 12px 0 0; color: var(--muted); font-size: 11px; line-height: 1.8; word-break: keep-all; }
 .media-form { display: grid; gap: 8px; margin-top: 15px; }
-.media-account { margin-top: 13px; padding: 11px; border: 1px solid var(--border); border-radius: 8px; background: var(--bg); }
-.media-account a { display: inline-block; color: var(--accent); font-size: 11px; line-height: 1.8; }
-.media-account p { margin: 7px 0 0; color: var(--muted); font-size: 10px; line-height: 1.8; word-break: keep-all; }
 .media-form label { color: var(--muted); font-size: 10px; }
 .media-form input { width: 100%; min-width: 0; border: 1px solid var(--border); background: var(--bg); color: var(--text); padding: 9px 10px; font-size: 11px; }
 .media-form button, .comments-actions button, .comments-more { border: 1px solid #365a49; background: var(--accent-bg); color: var(--accent); padding: 9px 12px; font-size: 11px; border-radius: 7px; }
@@ -55,3 +52,15 @@
   .comments-actions button, .comments-more { min-height: 40px; }
 }
 @media print { .sidebar-widgets, .comments-section { display: none; } }
+
+.comment-form { display: grid; gap: 9px; margin: 20px 0; }
+.comment-form label { font-size: 12px; color: var(--text); }
+.comment-form label span { color: var(--muted); }
+.comment-form input, .comment-form textarea { box-sizing: border-box; width: 100%; min-width: 0; border: 1px solid var(--border); border-radius: 8px; padding: 12px; background: var(--bg); color: var(--text); font: inherit; font-size: 16px; }
+.comment-form textarea { resize: vertical; min-height: 130px; line-height: 1.8; }
+.comment-form input:focus-visible, .comment-form textarea:focus-visible { outline: 2px solid var(--accent); outline-offset: 2px; }
+.comment-submit-row { display: flex; gap: 14px; align-items: center; justify-content: space-between; }
+.comment-submit-row p { margin: 0; color: var(--muted); font-size: 11px; line-height: 1.8; word-break: keep-all; }
+.comment-submit-row button { flex-shrink: 0; min-height: 44px; padding: 10px 24px; border: 1px solid #365a49; border-radius: 7px; background: var(--accent-bg); color: var(--accent); }
+.comment-meta strong { color: var(--accent); }
+.comment-trap { position: absolute; width: 1px; height: 1px; overflow: hidden; clip-path: inset(50%); }

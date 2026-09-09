@@ -107,31 +107,24 @@ GitHub Pages 배포 설정은 저장소의 **Settings → Pages**에서 관리�
 
 참고: [YouTube 임베드 문서](https://developers.google.com/youtube/player_parameters), [영상·재생목록 삽입 안내](https://support.google.com/youtube/answer/171780?hl=ko).
 
-### YouTube 로그인 계정 사용
-
-플레이어의 **YouTube에서 계정으로 이용** 또는 **YouTube Music에서 계정으로 이용**을 누르면 해당 공식 서비스를 새 탭으로 엽니다. 유효한 공유 링크를 입력했다면 해당 영상·곡·재생목록으로 이동하고, 링크가 없으면 서비스 홈을 엽니다. 중복 재생을 방지하기 위해 블로그 내 재생은 종료합니다.
-
-새 탭은 같은 브라우저 프로필에서 서비스의 기존 로그인 세션을 사용합니다. Chrome 로그인 설정, 시크릿 모드, 서비스 로그아웃 상태 등에 따라 다시 로그인해야 할 수 있습니다. 여러 계정이 있다면 공식 서비스의 프로필 메뉴에서 계정을 선택합니다.
-
-블로그는 Chrome 계정 정보를 읽거나 로그인 계정을 강제로 지정하지 않습니다. 이 버튼은 **공식 서비스에서 계정을 이용하는 기능**이며, 블로그 임베드에 로그인 상태나 Premium 권한을 연결하는 기능이 아닙니다. YouTube Data API의 OAuth 인증을 추가해도 임베드 재생 계정을 지정하는 공식 인터페이스는 제공되지 않습니다. 계정 토큰이나 비밀번호는 블로그에 저장하지 않습니다.
-
-참고: [Chrome과 Google 서비스 로그인](https://support.google.com/chrome/answer/13948160?hl=ko), [YouTube 임베드 지원 옵션](https://developers.google.com/youtube/player_parameters).
+블로그 로그인과 임베드 재생 계정을 연결하는 공식 기능은 제공되지 않습니다. 외부 서비스로 이동하는 별도의 **계정으로 이용** 버튼은 제거했습니다. 일반 링크 재생 기능은 유지합니다.
 
 ## 댓글과 의견
 
-각 포스트 하단에 GitHub Issues 기반의 댓글 패널을 표시합니다. **댓글 불러오기**로 기존 대화를 읽고, **첫 의견 남기기** 또는 **GitHub에서 댓글 쓰기**로 GitHub에 로그인해 작성합니다. 댓글 작성 자체는 GitHub 새 탭에서 이루어집니다.
+GitHub Issues 이동 방식 대신 페이지 안에서 이름과 댓글을 입력하고 **작성**을 누르는 익명 댓글 방식입니다. 이름은 선택 사항이며 비우면 `익명`으로 표시합니다. 방문자의 계정 가입, 로그인, 이메일 입력은 필요 없습니다. 이름은 본인 인증되지 않습니다.
 
-- 저장소는 공개 상태이고 Issues 기능이 활성화되어 있어야 합니다. 별도 서버, API 키, GitHub 앱 설치는 필요 없습니다.
-- 각 글의 URL 경로를 `[블로그 댓글] /글/경로/` 형식의 이슈 제목과 정확하게 연결합니다. 글 제목을 수정해도 경로가 같으면 같은 대화에 연결됩니다. **댓글 이슈의 제목을 바꾸면 연결이 끊어지므로 유지합니다.**
-- 첫 작성자는 미리 채워진 제목을 유지하고 본문에 의견을 적어 새 이슈를 등록합니다. 다른 방문자는 같은 이슈에 댓글을 답니다.
-- 첫 의견과 후속 댓글을 블로그에서 읽을 수 있습니다. 후속 댓글은 20개씩 더 불러오며, 안전한 일반 텍스트로 표시합니다. Markdown의 서식·첨부 이미지는 GitHub 원본에서 볼 수 있습니다.
-- 새 이슈는 GitHub 검색에 반영되기까지 지연될 수 있습니다. 작성 직후에는 열린 GitHub 대화를 사용하고, 블로그에서는 **댓글 새로고침**을 누릅니다.
-- GitHub API의 익명 조회 한도나 네트워크 오류가 발생하면 안내와 GitHub 링크를 제공합니다. 댓글 데이터는 로컬 저장소가 아닌 GitHub에 보관되며, 작성자는 저장소에서 댓글 수정·삭제·잠금 등을 관리합니다.
-- `_config.yml`의 `comments.enabled`로 전체 기능을 끄거나 `comments.repo`로 저장소를 지정합니다. 특정 글에서만 끄려면 Front Matter에 `comments: false`를 추가합니다.
+**현재 연결 상태:** 소유자 Cloudflare 계정의 `orbit-blog-comments` Worker와 D1에 연결했습니다. API 주소는 `https://orbit-blog-comments.orbit3230.workers.dev/comments`이며 `_config.yml`에 반영되어 있습니다. 블로그 소스를 GitHub Pages에 배포하면 방문자도 바로 이용할 수 있습니다. URL을 비우면 준비 중 안내를 표시합니다.
 
-추가 기능의 화면은 `_includes/media-player.html`, `_includes/comments.html`, `assets/community.css`, 동작은 `assets/community.js`에서 관리합니다.
+- 댓글은 GitHub Pages 파일이나 방문자의 브라우저 저장소가 아닌 D1에 저장되어 모든 방문자가 같은 대화를 읽습니다. 글의 URL 경로로 댓글을 구분합니다.
+- 저장 성공 응답을 받은 뒤 바로 목록 맨 위에 댓글을 표시합니다. 글 이동이나 사이트 재빌드는 필요 없습니다. 다른 방문자의 새 댓글은 새로고침으로 확인합니다.
+- 댓글은 최근 순으로 20개씩 더 불러옵니다. 이름은 40자, 내용은 2,000자까지 허용하고 HTML은 실행하지 않습니다.
+- 통신 실패 시 입력 내용을 유지합니다. 응답 유실 후 같은 폼에서 재시도하면 같은 요청 ID를 사용해 중복 저장을 방지합니다.
+- 서버에서 같은 네트워크의 연속 작성을 30초 간격·시간당 10개로 제한합니다. 이름은 인증하지 않으며 관리자 사칭 방지 배지도 부여하지 않습니다. 공개 익명 댓글이므로 스팸을 완전히 차단하는 구성은 아닙니다.
+- 댓글 내용·이름·작성 시간은 공개 저장됩니다. 원본 IP는 앱 DB에 저장하지 않으며, 도배 제한에는 일별 HMAC 식별자를 사용하고 2일 지난 값은 일별 작업으로 비웁니다. 네트워크 요청은 Cloudflare가 처리합니다.
+- 댓글 관리·삭제는 소유자 Cloudflare D1 콘솔에서 합니다. 방문자의 수정·삭제 기능과 기존 GitHub 댓글 자동 이관은 포함하지 않습니다. 기존 GitHub 이슈 데이터는 삭제하지 않습니다.
+- `_config.yml`의 `comments.enabled`로 전체 기능을 끄거나 특정 글의 Front Matter에 `comments: false`를 추가합니다.
 
-참고: [GitHub 댓글 API](https://docs.github.com/en/rest/issues/comments), [URL을 이용한 이슈 작성](https://docs.github.com/en/issues/tracking-your-work-with-issues/using-issues/creating-an-issue).
+설치·운영 방법은 [comment-service/README.md](comment-service/README.md)를 참고합니다. 서버 파일은 Jekyll 배포 결과에서 제외됩니다. 추가 기능 화면은 `_includes/media-player.html`, `_includes/comments.html`, `assets/community.css`, 동작은 `assets/community.js`에서 관리합니다.
 
 ## 라이선스
 

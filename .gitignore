@@ -48,3 +48,8 @@ node_modules
 # Local editor state and Jekyll metadata
 .vs/
 .jekyll-metadata
+
+# Local Cloudflare configuration and secrets
+comment-service/.wrangler/
+comment-service/.dev.vars*
+comment-service/.env*

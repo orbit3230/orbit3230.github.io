@@ -9,7 +9,6 @@
     const status = media.querySelector('[data-media-status], #media-status');
     const frame = media.querySelector('[data-media-frame]');
     const original = media.querySelector('[data-media-original]');
-    const account = media.querySelector('[data-media-account]');
     const stop = media.querySelector('[data-media-stop]');
     const buttons = [...media.querySelectorAll('[data-media-mode]')];
     const storageKey = 'orbit-media-links-v1';
@@ -34,7 +33,6 @@
       input.placeholder = mode === 'music' ? 'https://music.youtube.com/watch?v=…' : 'https://www.youtube.com/watch?v=…';
       description.textContent = mode === 'music' ? 'YouTube Music의 공개 곡·재생목록을 YouTube 플레이어로 재생합니다.' : '보고 싶은 영상이나 재생목록의 공유 링크를 붙여 넣으세요.';
       status.textContent = '링크를 불러온 뒤 플레이어의 재생 버튼을 눌러 주세요.';
-      updateAccountLink();
       save();
     }
     function parseLink(value) {
@@ -65,22 +63,11 @@
       if (playlist) source.searchParams.set('list',playlist);
       return { embed, source };
     }
-    function updateAccountLink() {
-      account.textContent = state.mode === 'music' ? 'YouTube Music에서 계정으로 이용 ↗' : 'YouTube에서 계정으로 이용 ↗';
-      account.href = state.mode === 'music' ? 'https://music.youtube.com/' : 'https://www.youtube.com/';
-      if (input.value.trim()) {
-        try { account.href = parseLink(input.value.trim()).source.href; } catch { /* Invalid links never leave the trusted service homepage. */ }
-      }
-    }
     input.value = state[state.mode];
     select(state.mode);
     media.open = matchMedia('(min-width: 1201px)').matches;
     buttons.forEach(button => button.addEventListener('click', () => { if (button.dataset.mediaMode !== state.mode) select(button.dataset.mediaMode); }));
-    input.addEventListener('input', () => { input.setCustomValidity(''); updateAccountLink(); });
-    [account, original].forEach(link => link.addEventListener('click', () => {
-      state[state.mode] = input.value.trim(); save();
-      endPlayback('원본 서비스를 열었습니다. 계정 선택과 로그인은 열린 서비스에서 진행해 주세요.');
-    }));
+    input.addEventListener('input', () => input.setCustomValidity(''));
     form.addEventListener('submit', event => {
       event.preventDefault();
       try {
@@ -107,93 +94,95 @@
   }
 
   const comments = document.querySelector('[data-comments]');
-  if (comments) {
-    const repo = comments.dataset.repo;
-    if (!/^[A-Za-z0-9_.-]+\/[A-Za-z0-9_.-]+$/.test(repo)) return;
-    const title = `[블로그 댓글] ${comments.dataset.postPath}`;
-    const base = `https://github.com/${repo}/issues`;
-    const query = `repo:${repo} is:issue in:title "${title}"`;
-    const write = comments.querySelector('[data-comments-write]');
-    const load = comments.querySelector('[data-comments-load]');
-    const more = comments.querySelector('[data-comments-more]');
-    const list = comments.querySelector('[data-comment-list]');
-    const status = comments.querySelector('[data-comments-status]');
-    const searchURL = new URL(base); searchURL.searchParams.set('q', `is:issue in:title "${title}"`);
-    write.href = searchURL.href;
-    let issue = null;
-    let page = 1;
-    let busy = false;
-    let blockedUntil = 0;
-    const validGithubURL = value => {
-      try { const url = new URL(value); return url.protocol === 'https:' && url.hostname === 'github.com' ? url.href : base; } catch { return base; }
-    };
-    async function request(url) {
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 12000);
-      try {
-        const response = await fetch(url, { credentials: 'omit', headers: { Accept: 'application/vnd.github+json' }, signal: controller.signal });
-        if (!response.ok) {
-          if (response.status === 403 || response.status === 429) {
-            const retry = Number(response.headers.get('retry-after'));
-            const reset = Number(response.headers.get('x-ratelimit-reset')) * 1000;
-            blockedUntil = Math.max(Date.now() + (retry > 0 ? retry : 60) * 1000, Number.isFinite(reset) ? reset : 0);
-            throw Error('GitHub의 조회 한도에 도달했습니다. 잠시 후 다시 시도하거나 GitHub에서 확인해 주세요.');
-          }
-          throw Error('댓글을 불러오지 못했습니다. GitHub에서 대화를 확인하거나 다시 시도해 주세요.');
-        }
-        return { data: await response.json(), hasNext: (response.headers.get('link') || '').includes('rel="next"') };
-      } finally { clearTimeout(timeout); }
-    }
-    function renderComment(comment, first = false) {
-      const article = document.createElement('article'); article.className = 'comment-card';
-      const header = document.createElement('div'); header.className = 'comment-meta';
-      const author = document.createElement('a'); author.textContent = comment.user?.login || '삭제된 사용자'; author.href = validGithubURL(comment.user?.html_url); author.target = '_blank'; author.rel = 'noopener noreferrer';
-      const date = document.createElement('a'); date.href = validGithubURL(comment.html_url); date.target = '_blank'; date.rel = 'noopener noreferrer';
-      const parsedDate = new Date(comment.created_at);
-      date.textContent = Number.isNaN(parsedDate.getTime()) ? 'GitHub에서 보기' : parsedDate.toLocaleDateString('ko-KR');
-      header.append(author,date);
-      if (first) { const badge = document.createElement('span'); badge.textContent = '대화 시작'; header.append(badge); }
-      const body = document.createElement('p'); body.className = 'comment-body'; body.textContent = comment.body || '(내용 없음)';
-      article.append(header,body); list.append(article);
-    }
-    async function loadDiscussion(append = false) {
-      if (busy) return;
-      if (Date.now() < blockedUntil) { status.textContent = 'GitHub 조회 한도가 회복된 뒤 다시 시도해 주세요. GitHub에서 댓글을 확인할 수 있습니다.'; return; }
-      busy = true; load.disabled = true; more.disabled = true;
-      status.textContent = '공개 댓글을 불러오는 중…';
-      try {
-        if (!append) {
-          page = 1;
-          const url = new URL('https://api.github.com/search/issues');
-          url.searchParams.set('q',query); url.searchParams.set('per_page','100'); url.searchParams.set('sort','created'); url.searchParams.set('order','asc');
-          const result = await request(url.href);
-          if (result.data.incomplete_results) throw Error('GitHub 검색이 지연되고 있습니다. 잠시 후 다시 확인해 주세요.');
-          issue = result.data.items.find(item => !item.pull_request && item.title === title && Number.isSafeInteger(item.number));
-          list.replaceChildren(); more.hidden = true;
-          if (!issue) {
-            const create = new URL(`${base}/new`);
-            create.searchParams.set('title',title);
-            create.searchParams.set('body',`글: ${comments.dataset.postTitle}\n${comments.dataset.postUrl}\n\n의견을 아래에 작성해 주세요. 이 제목은 글과 댓글을 연결하므로 그대로 두세요.\n\n`);
-            write.href = create.href; write.textContent = '첫 의견 남기기 ↗';
-            status.textContent = '아직 대화가 없습니다. 첫 의견은 GitHub에서 새 대화로 등록됩니다. 작성 직후에는 검색 반영까지 잠시 걸릴 수 있습니다.';
-            return;
-          }
-          write.href = `${base}/${issue.number}#new_comment_field`;
-          write.textContent = issue.locked ? 'GitHub에서 대화 보기 ↗' : 'GitHub에서 댓글 쓰기 ↗';
-          renderComment(issue,true);
-        }
-        if (!issue) return;
-        const result = await request(`https://api.github.com/repos/${repo}/issues/${issue.number}/comments?per_page=20&page=${page}`);
-        result.data.forEach(comment => renderComment(comment));
-        page += 1; more.hidden = !result.hasNext;
-        status.textContent = issue.locked ? '작성자가 잠근 대화입니다. 기존 댓글은 읽을 수 있습니다.' : '등록된 공개 의견입니다. 작성 후 새로고침을 눌러 확인해 주세요.';
-      } catch (error) {
-        status.textContent = error.name === 'AbortError' ? 'GitHub 응답이 지연됩니다. 잠시 후 다시 시도해 주세요.' : error.name === 'TypeError' ? '네트워크 연결을 확인한 뒤 다시 시도하거나 GitHub에서 대화를 확인해 주세요.' : error.message;
-      } finally {
-        busy = false; load.disabled = false; more.disabled = false; load.textContent = '댓글 새로고침';
-      }
-    }
-    load.addEventListener('click', () => loadDiscussion());
-    more.addEventListener('click', () => loadDiscussion(true));
+  if (!comments || !comments.dataset.endpoint) return;
+  let endpoint;
+  try {
+    endpoint = new URL(comments.dataset.endpoint);
+    if (endpoint.protocol !== 'https:' || endpoint.username || endpoint.password) throw Error();
+  } catch { return; }
+  const form = comments.querySelector('[data-comment-form]');
+  if (!form) return;
+  const name = form.elements.name;
+  const body = form.elements.body;
+  const submit = form.querySelector('button[type="submit"]');
+  const refresh = comments.querySelector('[data-comments-load]');
+  const more = comments.querySelector('[data-comments-more]');
+  const list = comments.querySelector('[data-comment-list]');
+  const status = comments.querySelector('[data-comments-status]');
+  const post = comments.dataset.postPath;
+  let cursor = null;
+  let loading = false;
+  let sending = false;
+  let pending = null;
+  let rendered = new Set();
+  function controls() {
+    refresh.disabled = loading || sending;
+    more.disabled = loading || sending;
+    submit.disabled = loading || sending;
   }
+  async function request(url, options = {}) {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+    try {
+      const response = await fetch(url, { ...options, credentials: 'omit', signal: controller.signal });
+      const data = await response.json();
+      if (!response.ok) throw Error(data.error || '댓글 처리에 실패했습니다. 잠시 후 다시 시도해 주세요.');
+      return data;
+    } catch (error) {
+      if (error.name === 'AbortError') throw Error('응답이 지연되고 있습니다. 입력 내용은 유지됩니다. 다시 시도해 주세요.');
+      throw error;
+    } finally { clearTimeout(timeout); }
+  }
+  function render(item, prepend = false) {
+    if (rendered.has(item.id)) return;
+    rendered.add(item.id);
+    const article = document.createElement('article'); article.className = 'comment-card';
+    const meta = document.createElement('div'); meta.className = 'comment-meta';
+    const author = document.createElement('strong'); author.textContent = item.name || '익명';
+    const time = document.createElement('time'); time.dateTime = item.created_at;
+    const date = new Date(item.created_at);
+    time.textContent = Number.isNaN(date.getTime()) ? '' : date.toLocaleString('ko-KR');
+    meta.append(author, time);
+    const text = document.createElement('p'); text.className = 'comment-body'; text.textContent = item.body;
+    article.append(meta, text);
+    if (prepend) list.prepend(article); else list.append(article);
+  }
+  async function load(append = false) {
+    if (loading || sending) return;
+    loading = true; controls(); status.textContent = '댓글을 불러오는 중…';
+    try {
+      const url = new URL(endpoint); url.searchParams.set('post', post);
+      if (append && cursor) url.searchParams.set('before', String(cursor));
+      const data = await request(url);
+      if (!Array.isArray(data.comments)) throw Error('댓글 응답을 확인할 수 없습니다. 다시 시도해 주세요.');
+      if (!append) { list.replaceChildren(); rendered = new Set(); }
+      data.comments.forEach(item => render(item));
+      cursor = data.next_cursor; more.hidden = !cursor;
+      status.textContent = rendered.size ? '최근 댓글부터 표시합니다.' : '아직 댓글이 없습니다. 첫 의견을 남겨 주세요.';
+    } catch (error) { status.textContent = '댓글을 불러오지 못했습니다. 새로고침으로 다시 시도해 주세요.'; }
+    finally { loading = false; controls(); }
+  }
+  form.addEventListener('submit', async event => {
+    event.preventDefault();
+    if (sending || loading) return;
+    const value = { post, name: name.value.trim(), body: body.value.trim(), website: form.elements.website.value };
+    if (!value.body || value.body.length > 2000 || value.name.length > 40) {
+      status.textContent = '댓글은 1~2,000자, 이름은 40자 이내로 입력해 주세요.'; body.focus(); return;
+    }
+    // Reuse an ID after an uncertain response so a retry cannot create a duplicate.
+    const fingerprint = JSON.stringify(value);
+    if (!pending || pending.fingerprint !== fingerprint) pending = { fingerprint, id: crypto.randomUUID() };
+    sending = true; controls(); name.readOnly = true; body.readOnly = true; submit.textContent = '작성 중…';
+    status.textContent = '댓글을 저장하는 중…';
+    try {
+      const data = await request(endpoint, { method: 'POST', headers: { 'Content-Type': 'application/json' }, body: JSON.stringify({ ...value, request_id: pending.id }) });
+      if (!data.comment || !Number.isSafeInteger(data.comment.id)) throw Error('저장 결과를 확인하지 못했습니다. 다시 시도해 주세요.');
+      render(data.comment, true); body.value = ''; pending = null;
+      status.textContent = '댓글이 작성되었습니다.';
+    } catch (error) { status.textContent = error instanceof TypeError ? '연결에 실패했습니다. 입력 내용은 유지됩니다. 다시 시도해 주세요.' : error.message; }
+    finally { sending = false; controls(); name.readOnly = false; body.readOnly = false; submit.textContent = '작성'; }
+  });
+  refresh.addEventListener('click', () => load());
+  more.addEventListener('click', () => load(true));
+  load();
 })();

@@ -1,0 +1,17 @@
+name = "orbit-blog-comments"
+main = "worker.mjs"
+compatibility_date = "2026-09-01"
+workers_dev = true
+preview_urls = false
+account_id = "27ab56a0d19da3701a0fcca3b6ba2a17"
+
+[vars]
+ALLOWED_ORIGINS = "https://orbit3230.github.io,http://127.0.0.1:4000,http://localhost:4000"
+
+[[d1_databases]]
+binding = "DB"
+database_name = "orbit-blog-comments"
+database_id = "1ec1452d-8d1b-441f-8e42-565707d8a3d4"
+
+[triggers]
+crons = ["0 3 * * *"]

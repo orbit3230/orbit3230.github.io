@@ -26,6 +26,7 @@ exclude:
   - LICENSE.md
   - README.md
   - scripts/
+  - comment-service/
 
 # Optimize Jekyl SEO Tag
 logo: logo.png
@@ -61,7 +62,7 @@ media:
   video_url: ""
   music_url: ""
 
-# Public GitHub Issues store one discussion per post URL.
+# Anonymous comments are stored by a separately deployed Cloudflare Worker.
 comments:
   enabled: true
-  repo: orbit3230/orbit3230.github.io
+  api_url: "https://orbit-blog-comments.orbit3230.workers.dev/comments"

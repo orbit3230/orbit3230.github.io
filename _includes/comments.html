@@ -1,11 +1,23 @@
 {% if site.comments.enabled and page.comments != false %}
-<section class="comments-section" id="comments" data-comments data-repo="{{ site.comments.repo | escape }}" data-post-path="{{ page.url | escape }}" data-post-title="{{ page.title | escape }}" data-post-url="{{ page.url | absolute_url | escape }}" aria-labelledby="comments-title">
-  <div class="section-heading"><h2 id="comments-title">댓글과 의견</h2><span>GitHub 계정으로 참여</span></div>
-  <p class="comments-intro">질문이나 다른 생각을 남겨 주세요. 작성은 GitHub에서, 대화는 이곳에서도 확인할 수 있습니다.</p>
-  <div class="comments-actions"><button type="button" data-comments-load>댓글 불러오기</button><a data-comments-write href="https://github.com/{{ site.comments.repo | escape }}/issues" target="_blank" rel="noopener noreferrer">GitHub에서 대화 찾기 ↗</a></div>
-  <p class="comments-status" data-comments-status role="status">댓글 불러오기를 누르면 이 글의 공개 대화를 조회합니다.</p>
+<section class="comments-section" id="comments" data-comments data-endpoint="{{ site.comments.api_url | default: '' | escape }}" data-post-path="{{ page.url | escape }}" aria-labelledby="comments-title">
+  <div class="section-heading"><h2 id="comments-title">댓글과 의견</h2><span>로그인 없이 참여</span></div>
+  {% if site.comments.api_url and site.comments.api_url != '' %}
+  <p class="comments-intro">이 페이지에서 자유롭게 의견을 남겨 주세요. 이름을 비우면 익명으로 표시됩니다.</p>
+  <form class="comment-form" data-comment-form>
+    <label for="comment-name">이름 <span>(선택)</span></label>
+    <input id="comment-name" name="name" maxlength="40" placeholder="익명" autocomplete="nickname">
+    <label for="comment-body">댓글</label>
+    <textarea id="comment-body" name="body" required maxlength="2000" rows="4" placeholder="의견을 남겨 주세요." aria-describedby="comment-help"></textarea>
+    <div class="comment-trap" aria-hidden="true"><label for="comment-website">Website</label><input id="comment-website" name="website" tabindex="-1" autocomplete="off"></div>
+    <div class="comment-submit-row"><p id="comment-help">댓글은 공개됩니다. 최대 2,000자 · 입력한 이름은 본인 인증되지 않습니다.</p><button type="submit">작성</button></div>
+  </form>
+  <div class="comments-actions"><button type="button" data-comments-load>새로고침</button></div>
+  <p class="comments-status" data-comments-status role="status" aria-live="polite">댓글을 불러오는 중…</p>
   <div class="comment-list" data-comment-list></div>
   <button type="button" class="comments-more" data-comments-more hidden>댓글 더 보기</button>
-  <noscript><p>GitHub에서 의견을 남기거나 확인할 수 있습니다.</p></noscript>
+  <noscript><p>댓글을 작성하거나 읽으려면 JavaScript를 켜 주세요.</p></noscript>
+  {% else %}
+  <p class="comments-status">댓글 저장 서비스를 연결하는 중입니다. 연결 후 이곳에서 로그인 없이 작성할 수 있습니다.</p>
+  {% endif %}
 </section>
 {% endif %}
