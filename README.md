@@ -12,6 +12,7 @@
 - **페이지 탐색**: 기본 5개, 5·10·20·50개씩 표시, 최대 10개 페이지 번호, 첫·마지막 페이지 및 번호 입력 이동
 - **글 읽기**: 다크 테마, 반응형 메뉴, 목차, 코드 강조, 관련 글
 - **전체 검색**: 제목·태그·본문 검색
+- **인터랙션**: 마우스를 따라오는 카드 조명, 카드·버튼의 호버/누름 반응, 메뉴 밑줄, 본문 읽기 진행률과 맨 위로 이동
 
 페이지 번호, 표시 개수, 필터는 URL에 반영되어 새로고침하거나 주소를 공유해도 복원됩니다. 최근 글의 기존 `/page2/` 같은 주소도 유지합니다.
 
@@ -63,6 +64,7 @@ last_modified_at: 2026-09-08
 | 사이트 이름·설명·기본 설정 | `_config.yml` |
 | 색상·글꼴·간격·모바일 화면 | `assets/styles.scss` |
 | 페이지 이동·필터·검색 동작 | `assets/site.js` |
+| 마우스 반응·읽기 진행률·맨 위로 이동 | `assets/interactions.css`, `assets/interactions.js` |
 | 로고·주 메뉴·프로필 | `_includes/sidebar-left.html` |
 | 글 목록 위 탐색 메뉴 | `_includes/home-header.html` |
 | 최근 글 제목·부제·레이아웃 | `_layouts/home.html` |
@@ -75,7 +77,9 @@ last_modified_at: 2026-09-08
 | 메인 로고 이미지 | `assets/pogohead.png` |
 | 브라우저·기기별 아이콘 | 루트의 `favicon*`, `apple-touch-icon.png`, `android-chrome-*.png`, `site.webmanifest` |
 
-스타일은 `assets/styles.scss` 한 곳에서 관리하며 별도의 `_sass/` 파일을 불러오지 않습니다. 메뉴는 위의 두 include 파일에서 관리합니다.
+기본 스타일은 `assets/styles.scss`, 댓글·플레이어는 `assets/community.css`, 인터랙션은 `assets/interactions.css`에서 관리합니다. 별도의 `_sass/` 파일은 불러오지 않습니다. 메뉴는 위의 두 include 파일에서 관리합니다.
+
+마우스 조명은 정밀 포인터에서만 활성화하며 화면 갱신 프레임당 한 번만 계산합니다. 모바일에서는 터치 시 버튼 반응을 제공하고, 운영체제의 모션 감소 설정에서는 이동 애니메이션과 마우스 조명을 끕니다. 키보드 포커스는 항상 표시하며, JavaScript가 없어도 글과 링크를 읽을 수 있습니다. 읽기 진행률은 댓글을 제외한 본문을 기준으로 계산합니다.
 
 ## 검색과 페이지 목록
 
