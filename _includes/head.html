@@ -5,6 +5,7 @@
   {% if site.media.enabled or site.comments.enabled %}<link rel="stylesheet" href="{{ '/assets/community.css' | relative_url }}">{% endif %}
 
   <link rel="stylesheet" href="{{ '/assets/interactions.css' | relative_url }}">
+  <link rel="stylesheet" href="{{ '/assets/reading-tools.css' | relative_url }}?v={{ site.time | date: '%s' }}">
 
   {%- seo -%}
   {%- feed_meta -%}

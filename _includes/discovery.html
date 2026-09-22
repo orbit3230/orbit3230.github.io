@@ -1,0 +1,16 @@
+<dialog class="discovery-dialog" id="quick-search" aria-labelledby="quick-search-title" data-search-url="{{ '/search.json' | relative_url }}" data-tags-url="{{ '/tags/' | relative_url }}">
+  <div class="dialog-top"><h2 id="quick-search-title">빠른 검색</h2><button type="button" data-dialog-close aria-label="검색 닫기">닫기 <kbd>Esc</kbd></button></div>
+  <label class="visually-hidden" for="quick-query">글 제목, 태그 또는 본문 검색</label>
+  <input id="quick-query" type="search" placeholder="글 제목, 태그 또는 본문 검색" autocomplete="off">
+  <p class="discovery-status" role="status" data-search-status>검색어를 입력하세요.</p>
+  <div class="quick-tags" aria-label="일치하는 태그"></div>
+  <ul class="quick-results" aria-label="검색 결과"></ul>
+  <p class="dialog-help">Tab으로 결과 이동 · Enter로 열기 · Esc로 닫기</p>
+</dialog>
+<dialog class="discovery-dialog preview-dialog" id="post-preview-dialog" aria-labelledby="preview-title">
+  <div class="dialog-top"><span class="eyebrow">POST PREVIEW</span><button type="button" data-dialog-close aria-label="미리보기 닫기">닫기 <kbd>Esc</kbd></button></div>
+  <h2 id="preview-title"></h2><p data-preview-summary></p>
+  <p class="discovery-status" role="status" data-preview-status></p>
+  <nav class="preview-outline" aria-label="미리보기 목차"><ol></ol></nav>
+  <a class="preview-read" href="#">글 전체 읽기 →</a>
+</dialog>

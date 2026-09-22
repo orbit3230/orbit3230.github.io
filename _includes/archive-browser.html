@@ -24,6 +24,13 @@
     </div>
   </div>
   <noscript><p class="notice">전체 글 목록입니다. 연도·태그 필터를 사용하려면 JavaScript를 켜 주세요.</p></noscript>
+  {% if include.mode == 'years' %}
+  <section class="month-timeline" aria-label="월별 기록 탐색" hidden>
+    <div class="timeline-caption"><h2 data-month-title>월별 기록</h2><button type="button" data-month="" aria-pressed="true">모든 월</button></div>
+    <div class="month-bars" role="group" aria-label="월 선택"></div>
+    <p class="timeline-help">막대를 선택하면 해당 월의 글만 표시합니다. 숫자는 글의 개수입니다.</p>
+  </section>
+  {% endif %}
   <div class="section-heading" data-list-heading tabindex="-1"><h2 id="archive-selection">전체 기록</h2>{% include list-options.html %}</div>
   <div id="archive-posts" class="posts">{% for post in site.posts %}{% include post-card.html post=post filterable=true %}{% endfor %}</div>
   <div class="empty-state" hidden><h2>일치하는 기록이 없습니다.</h2><p>다른 검색어를 입력하거나 선택한 필터를 초기화해 보세요.</p><button type="button" data-reset>필터 초기화</button></div>

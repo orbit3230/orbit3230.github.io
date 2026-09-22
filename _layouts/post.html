@@ -28,6 +28,12 @@ layout: default
   </div>
 
   </header>
+  <div class="reading-toolbar" hidden role="group" aria-label="읽기 설정">
+    <button type="button" data-focus-reading aria-pressed="false">집중해서 읽기</button>
+    <label>글자 크기 <select data-reading-size aria-label="글자 크기"><option value="16">기본</option><option value="18">크게</option><option value="20">더 크게</option></select></label>
+    <label>줄 간격 <select data-reading-spacing aria-label="줄 간격"><option value="1.85">기본</option><option value="2.1">넓게</option></select></label>
+    <span class="reading-setting-status" role="status"></span>
+  </div>
   <div class="post-body">{{ content }}</div>
 
   {% if page.tags %}

@@ -23,7 +23,7 @@
         entries = posts.map(post => ({ ...post, tags: (post.tags || []).flat(), categories: (post.categories || []).flat(), element: null }));
       } else {
         entries = [...container.querySelectorAll('[data-post]')].map(element => ({
-          element, title: element.dataset.title, year: element.dataset.year,
+          element, title: element.dataset.title, year: element.dataset.year, month: element.dataset.month,
           tags: JSON.parse(element.dataset.tags || '[]').flat(),
           categories: JSON.parse(element.dataset.categories || '[]').flat()
         }));
@@ -47,6 +47,25 @@
       let active = '';
       let expanded = false;
       let filtered = [];
+      let month = '';
+      const timeline = archive.querySelector('.month-timeline');
+      const monthButtons = [];
+      if (timeline) {
+        archive.querySelector('.filter-list').classList.add('year-timeline');
+        for (let number = 1; number <= 12; number++) {
+          const button = document.createElement('button');
+          button.type = 'button'; button.dataset.month = String(number).padStart(2, '0');
+          const count = document.createElement('span'); count.className = 'month-count';
+          const bar = document.createElement('span'); bar.className = 'month-bar'; bar.setAttribute('aria-hidden', 'true');
+          const label = document.createElement('span'); label.textContent = `${number}월`;
+          button.append(count, bar, label); timeline.querySelector('.month-bars').append(button); monthButtons.push(button);
+        }
+        timeline.addEventListener('click', event => {
+          const button = event.target.closest('button[data-month]');
+          if (!button || button.disabled) return;
+          month = button.dataset.month; filterChanged();
+        });
+      }
 
       function makeCard(post) {
         const element = document.createElement('article');
@@ -74,8 +93,10 @@
         const title = document.createElement('h2'); title.className = 'post-title'; title.append(link(post.url, post.title));
         const excerpt = document.createElement('p'); excerpt.className = 'entry-excerpt'; excerpt.textContent = post.excerpt;
         const arrow = link(post.url, '', 'entry-arrow'); arrow.setAttribute('aria-label', `${post.title} 읽기`);
+        const preview = document.createElement('button'); preview.type = 'button'; preview.className = 'post-preview';
+        preview.textContent = '미리보기 ↗'; preview.hidden = true; preview.setAttribute('aria-label', `${post.title} 미리보기`);
         if (arrowIcon) arrow.append(arrowIcon.cloneNode(true));
-        element.append(meta, title, excerpt, arrow);
+        element.append(meta, title, excerpt, preview, arrow);
         return element;
       }
 
@@ -85,6 +106,7 @@
         const text = query?.value.trim() || '';
         text ? url.searchParams.set('q', text) : url.searchParams.delete('q');
         mode !== 'years' && year?.value ? url.searchParams.set('year', year.value) : url.searchParams.delete('year');
+        mode === 'years' && year.value && month ? url.searchParams.set('month', month) : url.searchParams.delete('month');
         pageSize === 5 ? url.searchParams.delete('size') : url.searchParams.set('size', pageSize);
         targetPage === 1 ? url.searchParams.delete('page') : url.searchParams.set('page', targetPage);
         const selected = chips.find(chip => chip.dataset.filter === active);
@@ -98,6 +120,7 @@
       function render() {
         const terms = termsFor(query?.value);
         filtered = entries.filter(entry => (!year?.value || entry.year === year.value)
+          && (!month || mode !== 'years' || entry.month === month)
           && (!active || mode === 'years' || entry[mode].includes(active)) && matches(entry.text, terms));
         totalPages = Math.max(1, Math.ceil(filtered.length / pageSize));
         page = Math.max(1, Math.min(page, totalPages));
@@ -110,9 +133,27 @@
         }
         chips.forEach((chip, index) => {
           chip.setAttribute('aria-pressed', String(chip.dataset.filter === active));
-          chip.hidden = !expanded && index > 10 && chip.dataset.filter !== active;
+          chip.hidden = mode !== 'years' && !expanded && index > 10 && chip.dataset.filter !== active;
         });
         selection.textContent = recent ? '최근 글' : mode === 'years' ? (year.value ? `${year.value}년의 기록` : '전체 기록') : (active || '전체 기록');
+        if (timeline) {
+          timeline.hidden = !year.value;
+          if (year.value) {
+            const counts = Array(12).fill(0);
+            entries.filter(entry => entry.year === year.value && matches(entry.text, terms)).forEach(entry => { if (Number(entry.month) >= 1 && Number(entry.month) <= 12) counts[Number(entry.month) - 1]++; });
+            const maximum = Math.max(1, ...counts);
+            timeline.querySelector('[data-month-title]').textContent = `${year.value} · 월별 기록`;
+            timeline.querySelector('[data-month=""]').setAttribute('aria-pressed', String(!month));
+            monthButtons.forEach((button, index) => {
+              button.querySelector('.month-count').textContent = counts[index];
+              button.style.setProperty('--month-level', `${Math.max(4, counts[index] / maximum * 100)}%`);
+              button.disabled = counts[index] === 0 && month !== button.dataset.month;
+              button.setAttribute('aria-label', `${year.value}년 ${index + 1}월 · ${counts[index]}개의 글`);
+              button.setAttribute('aria-pressed', String(month === button.dataset.month));
+            });
+            if (month) selection.textContent = `${year.value}년 ${Number(month)}월의 기록`;
+          }
+        }
         count.textContent = `${filtered.length}개의 글 · 최신순`;
         if (empty) empty.hidden = filtered.length !== 0;
         pagination.hidden = filtered.length === 0;
@@ -138,6 +179,7 @@
           if (disabled) { a.removeAttribute('href'); a.tabIndex = -1; }
           else { a.href = stateURL(target).href; a.removeAttribute('tabindex'); }
         });
+        document.dispatchEvent(new CustomEvent('blog:listing-rendered'));
       }
       function navigate(target) {
         if (!Number.isSafeInteger(target) || target < 1 || target > totalPages || target === page) return;
@@ -152,6 +194,7 @@
         const slug = decode(url.hash.slice(1));
         active = chips.find(chip => chip.dataset.slug === slug || chip.dataset.filter === slug)?.dataset.filter || '';
         if (year) { year.value = mode === 'years' ? active : (url.searchParams.get('year') || ''); if (!year.value) year.value = ''; }
+        month = mode === 'years' && year.value && /^(0[1-9]|1[0-2])$/.test(url.searchParams.get('month')) ? url.searchParams.get('month') : '';
         const requestedSize = Number(url.searchParams.get('size'));
         pageSize = validSizes.includes(requestedSize) ? requestedSize : 5;
         const legacyPage = recent && location.pathname === initialPath ? Number(archive.dataset.initialPage) : 1;
@@ -162,14 +205,14 @@
       function filterChanged(replace = false) { page = 1; render(); writeURL(replace); }
       chips.forEach(chip => chip.addEventListener('click', () => {
         active = chip.dataset.filter;
-        if (mode === 'years') year.value = active;
+        if (mode === 'years') { year.value = active; month = ''; }
         filterChanged();
       }));
       query?.addEventListener('input', () => filterChanged(true));
-      year?.addEventListener('change', () => { if (mode === 'years') active = year.value; filterChanged(); });
+      year?.addEventListener('change', () => { if (mode === 'years') { active = year.value; month = ''; } filterChanged(); });
       sizeSelect.addEventListener('change', () => { pageSize = Number(sizeSelect.value); filterChanged(); });
       archive.querySelector('[data-reset]')?.addEventListener('click', () => {
-        active = ''; query.value = ''; year.value = ''; filterChanged(); query.focus();
+        active = ''; month = ''; query.value = ''; year.value = ''; filterChanged(); query.focus();
       });
       pagination.addEventListener('click', event => {
         const a = event.target.closest('a[data-page]');
@@ -182,7 +225,7 @@
         if (jumpInput.reportValidity()) navigate(Number(jumpInput.value));
       });
       if (toggle) {
-        toggle.hidden = chips.length <= 11;
+        toggle.hidden = mode === 'years' || chips.length <= 11;
         toggle.addEventListener('click', () => {
           expanded = !expanded; toggle.setAttribute('aria-expanded', String(expanded));
           toggle.textContent = expanded ? '태그 접기' : '태그 모두 보기'; render();
