@@ -43,6 +43,82 @@
   }
   if (!body || !toolbar) return;
   toolbar.hidden = false;
+  // The reading controls float above the article only when requested.
+  toolbar.classList.add('reading-toolbar-autohide');
+  toolbar.id = 'reading-toolbar';
+  toolbar.inert = true;
+  toolbar.setAttribute('aria-hidden', 'true');
+  const toolbarTrigger = document.createElement('button');
+  toolbarTrigger.type = 'button'; toolbarTrigger.className = 'reading-toolbar-trigger';
+  toolbarTrigger.textContent = '읽기 설정 열기';
+  toolbarTrigger.setAttribute('aria-controls', toolbar.id);
+  toolbarTrigger.setAttribute('aria-expanded', 'false');
+  toolbar.before(toolbarTrigger);
+  let hideTimer, keyboardNavigation = false, pointerInside = false, pointerNearTop = false, selectOpen = false;
+  function positionToolbar() {
+    const rect = body.getBoundingClientRect();
+    const width = Math.max(0, Math.min(rect.width, window.innerWidth - 32));
+    const left = Math.max(16, Math.min(rect.left, window.innerWidth - width - 16));
+    toolbar.style.setProperty('--toolbar-left', `${left}px`);
+    toolbar.style.setProperty('--toolbar-width', `${width}px`);
+  }
+  function hideToolbar(force = false) {
+    clearTimeout(hideTimer);
+    if (!force && (pointerInside || pointerNearTop || selectOpen || (keyboardNavigation && toolbar.contains(document.activeElement)))) return;
+    if (toolbar.contains(document.activeElement)) document.activeElement.blur();
+    toolbar.classList.remove('is-revealed');
+    toolbar.inert = true; toolbar.setAttribute('aria-hidden', 'true');
+    toolbarTrigger.setAttribute('aria-expanded', 'false');
+  }
+  function hideLater(delay = 2400) { clearTimeout(hideTimer); hideTimer = setTimeout(hideToolbar, delay); }
+  function showToolbar() {
+    if (document.querySelector('dialog[open]')) return;
+    positionToolbar(); toolbar.inert = false; toolbar.removeAttribute('aria-hidden');
+    toolbar.classList.add('is-revealed'); toolbarTrigger.setAttribute('aria-expanded', 'true');
+    hideLater();
+  }
+  toolbarTrigger.addEventListener('click', () => { keyboardNavigation = true; showToolbar(); toolbar.querySelector('button').focus({preventScroll:true}); });
+  document.addEventListener('keydown', event => { if (event.key === 'Tab') keyboardNavigation = true; });
+  document.addEventListener('pointerdown', event => {
+    keyboardNavigation = false;
+    selectOpen = toolbar.contains(event.target) && event.target.matches('select');
+    if (!toolbar.contains(event.target)) hideLater(350);
+  }, {passive:true});
+  document.addEventListener('pointermove', event => {
+    if (event.pointerType === 'touch' || !matchMedia('(any-hover: hover)').matches) return;
+    const rect = body.getBoundingClientRect();
+    const nearTop = event.clientY <= 48 && event.clientX >= rect.left && event.clientX <= rect.right;
+    const wasNear = pointerInside || pointerNearTop;
+    pointerNearTop = nearTop;
+    pointerInside = toolbar.contains(event.target) && toolbar.classList.contains('is-revealed');
+    if (nearTop || pointerInside) showToolbar(); else if (wasNear) hideLater(450);
+  }, {passive:true});
+  toolbar.addEventListener('pointerleave', () => { pointerInside = false; hideLater(450); });
+  document.addEventListener('pointerout', event => { if (!event.relatedTarget) { pointerInside = false; pointerNearTop = false; hideLater(450); } }, {passive:true});
+  toolbar.addEventListener('focusin', () => { showToolbar(); });
+  toolbar.addEventListener('focusout', () => { selectOpen = false; hideLater(); });
+  toolbar.addEventListener('change', () => { selectOpen = false; hideLater(); });
+  toolbar.addEventListener('pointerup', () => { hideLater(); }, {passive:true});
+  let touchStart;
+  document.addEventListener('touchstart', event => {
+    touchStart = null;
+    if (event.touches.length !== 1 || event.target.closest('input, textarea, select, button, a, dialog, .reading-toolbar, .reading-table, .sidebar-left, .sidebar-right, .comments-section') || !main.contains(event.target)) return;
+    touchStart = {x:event.touches[0].clientX, y:event.touches[0].clientY};
+  }, {passive:true});
+  document.addEventListener('touchend', event => {
+    if (!touchStart || event.changedTouches.length !== 1) { touchStart = null; return; }
+    const dx = event.changedTouches[0].clientX - touchStart.x;
+    const dy = event.changedTouches[0].clientY - touchStart.y;
+    touchStart = null;
+    if (Math.abs(dy) < 40 || Math.abs(dy) < Math.abs(dx) * 1.5) return;
+    keyboardNavigation = false; pointerInside = false; pointerNearTop = false; selectOpen = false;
+    if (dy > 0) showToolbar(); else hideToolbar(true);
+  }, {passive:true});
+  document.addEventListener('touchcancel', () => { touchStart = null; }, {passive:true});
+  window.addEventListener('blur', () => { pointerInside = false; pointerNearTop = false; selectOpen = false; hideToolbar(true); });
+  window.addEventListener('resize', positionToolbar, {passive:true});
+  if ('ResizeObserver' in window) new ResizeObserver(positionToolbar).observe(body);
+  positionToolbar();
   const size = toolbar.querySelector('[data-reading-size]');
   const spacing = toolbar.querySelector('[data-reading-spacing]');
   const toggle = toolbar.querySelector('[data-focus-reading]');
@@ -60,6 +136,7 @@
     const anchor = blocks.find(node => node.getBoundingClientRect().bottom > 120);
     const top = anchor?.getBoundingClientRect().top;
     change();
+    positionToolbar();
     if (anchor && top < window.innerHeight) window.scrollBy({ top: anchor.getBoundingClientRect().top - top, behavior: 'instant' });
   }
   [size, spacing].forEach(control => control.addEventListener('change', () => {
