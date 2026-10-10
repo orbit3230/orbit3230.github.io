@@ -134,7 +134,7 @@ input::placeholder { color: #929da3; }
 .toc li { padding: 4px 0; }
 .toc a { color: var(--muted); }
 .toc a:hover, .toc a[aria-current] { color: var(--accent); }
-.back-to-top { display: inline-block; margin-top: 25px; color: var(--muted); font-size: 11px; }
+.toc-back-to-top { display: inline-block; margin-top: 25px; color: var(--muted); font-size: 11px; }
 .post, .page { color: #c7cfd3; line-height: 1.95; font-size: 15px; }
 .post-header { border-bottom: 1px solid var(--border); padding-bottom: 28px; margin-bottom: 36px; }
 .back-link { color: var(--muted); font-size: 11px; display: inline-block; margin-bottom: 20px; }
@@ -193,7 +193,7 @@ mark { background: #4d4428; color: #f7e8ab; padding: 2px 4px; }
   .toc-wrapper { position: static; max-height: 240px; border: 1px solid var(--border); border-radius: 9px; padding: 14px 18px; background: var(--surface); }
   .toc-title { margin: 0; }
   .toc-wrapper[open] .toc-title { margin-bottom: 12px; }
-  .toc-wrapper .back-to-top { display: none; }
+  .toc-wrapper .toc-back-to-top { display: none; }
 }
 @media (max-width: 760px) {
   .site-shell, .has-toc { display: flex; flex-direction: column; }

@@ -63,16 +63,23 @@
   }
   const topButton = document.createElement('button');
   topButton.type = 'button';
-  topButton.className = 'back-to-top';
+  topButton.className = 'back-to-top reading-nav-button';
   topButton.hidden = true;
   topButton.setAttribute('aria-label', '맨 위로 이동');
   topButton.title = '맨 위로 이동';
   topButton.innerHTML = '<svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true"><path d="m6 12 6-6 6 6M12 6v13"/></svg>';
+  const topLabel = document.createElement('span'); topLabel.textContent = '맨 위로'; topButton.append(topLabel);
   topButton.addEventListener('click', () => {
     main.focus({ preventScroll: true });
     window.scrollTo({ top: 0, behavior: reducedMotion.matches ? 'instant' : 'smooth' });
   });
-  document.body.append(topButton);
+  let navigation = document.querySelector('.reading-navigation');
+  if (!navigation) {
+    navigation = document.createElement('div'); navigation.className = 'reading-navigation';
+    navigation.setAttribute('role', 'group'); navigation.setAttribute('aria-label', '읽기 이동');
+    document.body.append(navigation);
+  }
+  navigation.append(topButton);
 
   let scrollFrame = 0;
   function updateScroll() {

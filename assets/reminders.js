@@ -41,6 +41,16 @@
   const next = document.createElement('button'); next.type = 'button'; next.textContent = '다음';
   next.setAttribute('aria-label', '저장한 소제목 다음 페이지');
   pager.append(prev, pageLabel, next); panel.append(summary, help, list, empty, pager);
+  const nextBookmark = document.createElement('button'); nextBookmark.type = 'button';
+  nextBookmark.className = 'reminder-next-bookmark reading-nav-button'; nextBookmark.textContent = '다음 북마크 ↓';
+  nextBookmark.addEventListener('click', () => goNext());
+  let navigation = document.querySelector('.reading-navigation');
+  if (!navigation) {
+    navigation = document.createElement('div'); navigation.className = 'reading-navigation';
+    navigation.setAttribute('role', 'group'); navigation.setAttribute('aria-label', '읽기 이동');
+    document.body.append(navigation);
+  }
+  navigation.prepend(nextBookmark);
   const desktopSlot = document.createElement('div'); desktopSlot.className = 'reminder-desktop-slot';
   sidebar.after(desktopSlot);
   const mobileSlot = document.createElement('div'); mobileSlot.className = 'reminder-mobile-slot';
@@ -69,6 +79,24 @@
     button.addEventListener('click', () => toggle(item));
     heading.append(button); controls.push({ heading, button, item });
   });
+  function markedHeadings() {
+    const saved = new Set(items.map(identity));
+    return controls.filter(control => saved.has(identity(control.item)));
+  }
+  function upcoming(marked) {
+    const readingLine = Math.max(80, window.innerHeight * .12);
+    return marked.find(control => control.heading.getBoundingClientRect().top > readingLine + 1) || marked[0];
+  }
+  function goNext() {
+    const marked = markedHeadings();
+    if (!marked.length) return;
+    const target = upcoming(marked);
+    // Keep some breathing room above the heading without moving any sidebar.
+    const top = Math.max(0, window.scrollY + target.heading.getBoundingClientRect().top - 80);
+    target.button.focus({ preventScroll: true });
+    window.scrollTo({ top, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth' });
+    announce(`${marked.indexOf(target) + 1} / ${marked.length} 북마크 · ${target.item.heading}`);
+  }
   function toggle(item, removeOnly = false) {
     // Read on every edit to preserve changes made in other tabs.
     let latest;
@@ -94,6 +122,9 @@
       button.title = marked ? '다시 보기 표시 해제' : '나중에 다시 보기';
       heading.classList.toggle('has-reminder', marked);
     });
+    const marked = markedHeadings();
+    nextBookmark.hidden = marked.length === 0;
+    updateDestination();
     count.textContent = String(items.length);
     const pages = Math.max(1, Math.ceil(items.length / 5)); page = Math.min(page, pages);
     const focusInList = list.contains(document.activeElement);
@@ -118,6 +149,17 @@
   }
   prev.addEventListener('click', () => { page--; render(); });
   next.addEventListener('click', () => { page++; render(); });
+  function updateDestination() {
+    const target = upcoming(markedHeadings());
+    nextBookmark.title = target ? `이동할 북마크: ${target.item.heading}` : '이 글에 저장된 북마크가 없습니다.';
+  }
+  let navigationFrame = 0;
+  function scheduleDestination() {
+    if (navigationFrame) return;
+    navigationFrame = requestAnimationFrame(() => { navigationFrame = 0; updateDestination(); });
+  }
+  window.addEventListener('scroll', scheduleDestination, {passive:true});
+  window.addEventListener('resize', scheduleDestination, {passive:true});
   window.addEventListener('storage', event => {
     if (event.key !== key && event.key !== null) return;
     try { items = read(); unavailable = false; } catch { items = []; unavailable = true; }

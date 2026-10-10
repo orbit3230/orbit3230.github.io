@@ -15,7 +15,7 @@
 .reminder-pages { display:flex; align-items:center; justify-content:space-between; padding:10px; gap:8px; color:var(--muted); font-size:11px; }
 .reminder-pages button { background:transparent; border:1px solid var(--border); padding:4px 8px; font-size:11px; }
 .reminder-pages button:disabled { opacity:.4; cursor:default; }
-.reminder-feedback { position:fixed; bottom:24px; left:50%; transform:translateX(-50%); max-width:calc(100% - 40px); width:max-content; padding:10px 16px; border:1px solid #365a49; border-radius:10px; background:var(--surface); color:var(--accent); font-size:13px; line-height:1.6; box-shadow:0 8px 30px #0005; pointer-events:none; z-index:30; }
+.reminder-feedback { position:fixed; bottom:calc(82px + env(safe-area-inset-bottom)); left:50%; transform:translateX(-50%); max-width:calc(100% - 40px); width:max-content; padding:10px 16px; border:1px solid #365a49; border-radius:10px; background:var(--surface); color:var(--accent); font-size:13px; line-height:1.6; box-shadow:0 8px 30px #0005; pointer-events:none; z-index:30; }
 .reminder-feedback:empty { display:none; }
 @media(max-width:760px) {
   .heading-reminder { width:40px; height:40px; opacity:1; }
