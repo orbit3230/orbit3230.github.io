@@ -318,20 +318,69 @@
 
   const toc = document.querySelector('.toc-wrapper');
   if (toc) {
-    // Small screens start with a compact, explicitly expandable table of contents.
+    // Small screens keep their explicitly expandable table of contents.
     if (matchMedia('(max-width: 1200px)').matches) toc.open = false;
-    const links = [...toc.querySelectorAll('.toc-nav a')];
-    if ('IntersectionObserver' in window) {
-      const observer = new IntersectionObserver((records) => {
-        const visible = records.filter((entry) => entry.isIntersecting);
-        if (!visible.length) return;
-        const id = visible[0].target.id;
-        links.forEach((link) => {
-          if (decode(link.hash.slice(1)) === id) link.setAttribute('aria-current', 'location');
-          else link.removeAttribute('aria-current');
-        });
-      }, { rootMargin: '-5% 0px -70% 0px' });
-      links.forEach((link) => { const heading = document.getElementById(decode(link.hash.slice(1))); if (heading) observer.observe(heading); });
+    const entries = [...toc.querySelectorAll('.toc-nav a')].map(link => ({
+      link, heading: document.getElementById(decode(link.hash.slice(1)))
+    })).filter(entry => entry.heading);
+    const widgets = toc.closest('.sidebar-widgets');
+    let activeLink = null, frame = 0, hovered = false, revealPending = true;
+
+    function revealActive() {
+      if (!activeLink || !toc.open || !toc.getClientRects().length || hovered || toc.contains(document.activeElement)) return;
+      // Scroll only the sidebar containers, never the document or article.
+      // Inner scrolling is immediate so the outer bounds use the new position.
+      for (const container of [toc, widgets]) {
+        if (!container || container.scrollHeight <= container.clientHeight) continue;
+        if (!['auto', 'scroll'].includes(getComputedStyle(container).overflowY)) continue;
+        const bounds = container.getBoundingClientRect();
+        const linkBounds = activeLink.getBoundingClientRect();
+        const padding = Math.min(20, container.clientHeight / 4);
+        const top = bounds.top + container.clientTop + padding;
+        const bottom = bounds.top + container.clientTop + container.clientHeight - padding;
+        const delta = linkBounds.top < top ? linkBounds.top - top
+          : linkBounds.bottom > bottom ? (linkBounds.height > bottom - top ? linkBounds.top - top : linkBounds.bottom - bottom) : 0;
+        if (delta) container.scrollTo({ top: container.scrollTop + delta, behavior: 'instant' });
+      }
     }
+    function update() {
+      frame = 0;
+      // Use heading positions, so long sections and fast reverse scrolling
+      // remain accurate even when no heading intersects a narrow observer band.
+      const readingLine = Math.max(80, window.innerHeight * .12);
+      let current = entries[0]?.link;
+      for (const entry of entries) {
+        if (entry.heading.getBoundingClientRect().top > readingLine) break;
+        current = entry.link;
+      }
+      const changed = current !== activeLink;
+      if (changed) {
+        activeLink?.removeAttribute('aria-current');
+        activeLink = current;
+        activeLink?.setAttribute('aria-current', 'location');
+      }
+      if (changed || revealPending) revealActive();
+      revealPending = false;
+    }
+    function schedule(reveal = false) {
+      revealPending = revealPending || reveal;
+      if (!frame) frame = requestAnimationFrame(update);
+    }
+    window.addEventListener('scroll', () => schedule(), { passive: true });
+    window.addEventListener('resize', () => schedule(true), { passive: true });
+    window.addEventListener('pageshow', () => schedule(true));
+    window.addEventListener('hashchange', () => schedule(true));
+    toc.addEventListener('toggle', () => schedule(true));
+    toc.addEventListener('pointerenter', event => { if (event.pointerType !== 'touch') hovered = true; });
+    toc.addEventListener('pointerleave', () => { hovered = false; schedule(true); });
+    toc.addEventListener('focusout', () => schedule(true));
+    if ('ResizeObserver' in window) {
+      const observer = new ResizeObserver(() => schedule(true));
+      observer.observe(toc);
+      const article = document.querySelector('.post-body');
+      if (article) observer.observe(article);
+    }
+    schedule(true);
   }
+
 })();
