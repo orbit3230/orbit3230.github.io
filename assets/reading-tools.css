@@ -95,3 +95,7 @@ body:has(.discovery-dialog[open]) { overflow:hidden; }
 }
 @media(prefers-reduced-motion:reduce) { .month-bar { transition:none; } }
 @media print { .reading-toolbar,.reading-toolbar-trigger,.resume-reading,.post-preview,.quick-search-trigger,.discovery-dialog,.code-copy,.table-scroll-hint { display:none !important; } .reading-table { overflow:visible; } }
+
+@media (max-width:760px), (hover:none) {
+  .reading-toolbar,.reading-toolbar-trigger { display:none !important; }
+}

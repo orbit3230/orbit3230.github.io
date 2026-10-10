@@ -42,6 +42,7 @@
     banner.append(text, action, dismiss); main.prepend(banner);
   }
   if (!body || !toolbar) return;
+  const mobileToolbar = matchMedia('(max-width: 760px), (hover: none)');
   toolbar.hidden = false;
   // The reading controls float above the article only when requested.
   toolbar.classList.add('reading-toolbar-autohide');
@@ -72,12 +73,12 @@
   }
   function hideLater(delay = 2400) { clearTimeout(hideTimer); hideTimer = setTimeout(hideToolbar, delay); }
   function showToolbar() {
-    if (document.querySelector('dialog[open]')) return;
+    if (mobileToolbar.matches || document.querySelector('dialog[open]')) return;
     positionToolbar(); toolbar.inert = false; toolbar.removeAttribute('aria-hidden');
     toolbar.classList.add('is-revealed'); toolbarTrigger.setAttribute('aria-expanded', 'true');
     hideLater();
   }
-  toolbarTrigger.addEventListener('click', () => { keyboardNavigation = true; showToolbar(); toolbar.querySelector('button').focus({preventScroll:true}); });
+  toolbarTrigger.addEventListener('click', () => { if (mobileToolbar.matches) return; keyboardNavigation = true; showToolbar(); toolbar.querySelector('button').focus({preventScroll:true}); });
   document.addEventListener('keydown', event => { if (event.key === 'Tab') keyboardNavigation = true; });
   document.addEventListener('pointerdown', event => {
     keyboardNavigation = false;
@@ -99,22 +100,6 @@
   toolbar.addEventListener('focusout', () => { selectOpen = false; hideLater(); });
   toolbar.addEventListener('change', () => { selectOpen = false; hideLater(); });
   toolbar.addEventListener('pointerup', () => { hideLater(); }, {passive:true});
-  let touchStart;
-  document.addEventListener('touchstart', event => {
-    touchStart = null;
-    if (event.touches.length !== 1 || event.target.closest('input, textarea, select, button, a, dialog, .reading-toolbar, .reading-table, .sidebar-left, .sidebar-right, .comments-section') || !main.contains(event.target)) return;
-    touchStart = {x:event.touches[0].clientX, y:event.touches[0].clientY};
-  }, {passive:true});
-  document.addEventListener('touchend', event => {
-    if (!touchStart || event.changedTouches.length !== 1) { touchStart = null; return; }
-    const dx = event.changedTouches[0].clientX - touchStart.x;
-    const dy = event.changedTouches[0].clientY - touchStart.y;
-    touchStart = null;
-    if (Math.abs(dy) < 40 || Math.abs(dy) < Math.abs(dx) * 1.5) return;
-    keyboardNavigation = false; pointerInside = false; pointerNearTop = false; selectOpen = false;
-    if (dy > 0) showToolbar(); else hideToolbar(true);
-  }, {passive:true});
-  document.addEventListener('touchcancel', () => { touchStart = null; }, {passive:true});
   window.addEventListener('blur', () => { pointerInside = false; pointerNearTop = false; selectOpen = false; hideToolbar(true); });
   window.addEventListener('resize', positionToolbar, {passive:true});
   if ('ResizeObserver' in window) new ResizeObserver(positionToolbar).observe(body);
@@ -150,6 +135,16 @@
     status.textContent = active ? '보조 패널을 접었습니다. Esc로 종료할 수 있습니다.' : '기본 화면으로 돌아왔습니다.';
   }
   toggle.addEventListener('click', () => setFocus(!document.body.classList.contains('focus-reading')));
+  function syncToolbarAvailability() {
+    toolbarTrigger.hidden = mobileToolbar.matches;
+    if (mobileToolbar.matches) {
+      pointerInside = false; pointerNearTop = false; selectOpen = false;
+      hideToolbar(true);
+      if (document.body.classList.contains('focus-reading')) setFocus(false);
+    }
+  }
+  mobileToolbar.addEventListener('change', syncToolbarAvailability);
+  syncToolbarAvailability();
   document.addEventListener('keydown', event => {
     if (event.key === 'Escape' && !document.querySelector('dialog[open]') && document.body.classList.contains('focus-reading')) { setFocus(false); toggle.focus({preventScroll:true}); }
   });
