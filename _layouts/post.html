@@ -32,6 +32,22 @@ layout: default
     <button type="button" data-focus-reading aria-pressed="false">집중해서 읽기</button>
     <label>글자 크기 <select data-reading-size aria-label="글자 크기"><option value="16">기본</option><option value="18">크게</option><option value="20">더 크게</option></select></label>
     <label>줄 간격 <select data-reading-spacing aria-label="줄 간격"><option value="1.85">기본</option><option value="2.1">넓게</option></select></label>
+    <nav class="reading-post-navigation" aria-label="이전 글과 다음 글">
+      {% if page.previous %}
+      <a class="reading-post-link" href="{{ page.previous.url | relative_url }}" rel="prev" aria-label="이전 글: {{ page.previous.title | escape }}" title="이전 글: {{ page.previous.title | escape }}">
+      {% else %}
+      <span class="reading-post-link" role="link" aria-disabled="true" aria-label="이전 글 없음" title="이전 글이 없습니다">
+      {% endif %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m14 6-6 6 6 6M8 12h12M4 5v14"/></svg>
+      {% if page.previous %}</a>{% else %}</span>{% endif %}
+      {% if page.next %}
+      <a class="reading-post-link" href="{{ page.next.url | relative_url }}" rel="next" aria-label="다음 글: {{ page.next.title | escape }}" title="다음 글: {{ page.next.title | escape }}">
+      {% else %}
+      <span class="reading-post-link" role="link" aria-disabled="true" aria-label="다음 글 없음" title="다음 글이 없습니다">
+      {% endif %}
+        <svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" stroke-linecap="round" stroke-linejoin="round" aria-hidden="true" focusable="false"><path d="m10 6 6 6-6 6M4 12h12M20 5v14"/></svg>
+      {% if page.next %}</a>{% else %}</span>{% endif %}
+    </nav>
     <span class="reading-setting-status" role="status"></span>
   </div>
   <div class="post-body">{{ content }}</div>

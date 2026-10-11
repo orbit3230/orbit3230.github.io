@@ -60,6 +60,11 @@ body:has(.discovery-dialog[open]) { overflow:hidden; }
 .reading-toolbar label { display:flex; align-items:center; gap:6px; font-size:11px; color:var(--muted); }
 .reading-toolbar button,.reading-toolbar select { padding:8px 10px; font-size:11px; }
 .reading-toolbar button[aria-pressed='true'] { background:var(--accent-bg); color:var(--accent); border-color:#52836f; }
+.reading-post-navigation { display:flex; flex:0 0 auto; gap:6px; margin-left:auto; }
+.reading-post-link { display:inline-flex; align-items:center; justify-content:center; width:36px; height:36px; border:1px solid var(--border); border-radius:8px; background:var(--surface); color:var(--muted); }
+.reading-post-link svg { width:18px; height:18px; }
+.reading-post-link[href]:hover,.reading-post-link[href]:focus-visible { color:var(--accent); background:var(--accent-bg); border-color:#52836f; }
+.reading-post-link[aria-disabled='true'] { opacity:.3; cursor:default; }
 .reading-setting-status { flex-basis:100%; min-height:1em; color:var(--muted); font-size:10px; line-height:1.6; }
 .reading-setting-status:empty { display:none; }
 .post-body { font-size:var(--reading-size,16px); line-height:var(--reading-spacing,1.85); }
