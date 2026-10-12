@@ -109,6 +109,7 @@
   const toggle = toolbar.querySelector('[data-focus-reading]');
   const status = toolbar.querySelector('[role="status"]');
   const settings = read(settingsKey) || {};
+  let focusPreference = settings.focus === true;
   size.value = ['16','18','20'].includes(settings.size) ? settings.size : '16';
   spacing.value = ['1.85','2.1'].includes(settings.spacing) ? settings.spacing : '1.85';
   function applySettings() {
@@ -116,6 +117,9 @@
     body.style.setProperty('--reading-spacing', spacing.value);
   }
   applySettings();
+  function saveSettings() {
+    return write(settingsKey, {size:size.value, spacing:spacing.value, focus:focusPreference});
+  }
   function preservePosition(change) {
     const blocks = [...body.children];
     const anchor = blocks.find(node => node.getBoundingClientRect().bottom > 120);
@@ -126,13 +130,17 @@
   }
   [size, spacing].forEach(control => control.addEventListener('change', () => {
     preservePosition(applySettings);
-    status.textContent = write(settingsKey, {size:size.value, spacing:spacing.value}) ? '읽기 설정 저장됨' : '이 페이지에 적용됨';
+    status.textContent = saveSettings() ? '읽기 설정 저장됨' : '이 페이지에 적용됨';
   }));
-  function setFocus(active) {
+  function setFocus(active, persist = true) {
     preservePosition(() => document.body.classList.toggle('focus-reading', active));
     toggle.setAttribute('aria-pressed', String(active));
     toggle.textContent = active ? '집중 읽기 종료' : '집중해서 읽기';
     status.textContent = active ? '보조 패널을 접었습니다. Esc로 종료할 수 있습니다.' : '기본 화면으로 돌아왔습니다.';
+    if (persist) {
+      focusPreference = active;
+      if (!saveSettings()) status.textContent += ' 저장 공간을 사용할 수 없어 이 페이지에만 적용됩니다.';
+    }
   }
   toggle.addEventListener('click', () => setFocus(!document.body.classList.contains('focus-reading')));
   function syncToolbarAvailability() {
@@ -140,8 +148,9 @@
     if (mobileToolbar.matches) {
       pointerInside = false; pointerNearTop = false; selectOpen = false;
       hideToolbar(true);
-      if (document.body.classList.contains('focus-reading')) setFocus(false);
     }
+    // Mobile hides the controls temporarily without erasing the desktop preference.
+    setFocus(!mobileToolbar.matches && focusPreference, false);
   }
   mobileToolbar.addEventListener('change', syncToolbarAvailability);
   syncToolbarAvailability();

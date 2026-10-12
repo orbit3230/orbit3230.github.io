@@ -79,7 +79,7 @@
     navigation.setAttribute('role', 'group'); navigation.setAttribute('aria-label', '읽기 이동');
     document.body.append(navigation);
   }
-  navigation.append(topButton);
+  navigation.prepend(topButton);
 
   let scrollFrame = 0;
   function updateScroll() {

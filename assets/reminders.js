@@ -43,14 +43,19 @@
   pager.append(prev, pageLabel, next); panel.append(summary, help, list, empty, pager);
   const nextBookmark = document.createElement('button'); nextBookmark.type = 'button';
   nextBookmark.className = 'reminder-next-bookmark reading-nav-button'; nextBookmark.textContent = '다음 북마크 ↓';
-  nextBookmark.addEventListener('click', () => goNext());
+  nextBookmark.addEventListener('click', () => goBookmark(1));
+  const previousBookmark = document.createElement('button'); previousBookmark.type = 'button';
+  previousBookmark.className = 'reminder-previous-bookmark reading-nav-button'; previousBookmark.textContent = '이전 북마크 ↑';
+  previousBookmark.addEventListener('click', () => goBookmark(-1));
+  const bookmarkNavigation = document.createElement('div'); bookmarkNavigation.className = 'bookmark-navigation';
+  bookmarkNavigation.append(previousBookmark, nextBookmark);
   let navigation = document.querySelector('.reading-navigation');
   if (!navigation) {
     navigation = document.createElement('div'); navigation.className = 'reading-navigation';
     navigation.setAttribute('role', 'group'); navigation.setAttribute('aria-label', '읽기 이동');
     document.body.append(navigation);
   }
-  navigation.prepend(nextBookmark);
+  navigation.append(bookmarkNavigation);
   const desktopSlot = document.createElement('div'); desktopSlot.className = 'reminder-desktop-slot';
   sidebar.after(desktopSlot);
   const mobileSlot = document.createElement('div'); mobileSlot.className = 'reminder-mobile-slot';
@@ -83,14 +88,19 @@
     const saved = new Set(items.map(identity));
     return controls.filter(control => saved.has(identity(control.item)));
   }
-  function upcoming(marked) {
+  function destination(marked, direction) {
+    if (!marked.length) return null;
     const readingLine = Math.max(80, window.innerHeight * .12);
-    return marked.find(control => control.heading.getBoundingClientRect().top > readingLine + 1) || marked[0];
+    const upcoming = marked.findIndex(control => control.heading.getBoundingClientRect().top > readingLine + 1);
+    if (direction > 0) return marked[upcoming < 0 ? 0 : upcoming];
+    // The last heading above the reading line is the current bookmark section.
+    const current = upcoming < 0 ? marked.length - 1 : upcoming - 1;
+    return marked[current <= 0 ? marked.length - 1 : current - 1];
   }
-  function goNext() {
+  function goBookmark(direction) {
     const marked = markedHeadings();
     if (!marked.length) return;
-    const target = upcoming(marked);
+    const target = destination(marked, direction);
     // Keep some breathing room above the heading without moving any sidebar.
     const top = Math.max(0, window.scrollY + target.heading.getBoundingClientRect().top - 80);
     target.button.focus({ preventScroll: true });
@@ -124,6 +134,8 @@
     });
     const marked = markedHeadings();
     nextBookmark.hidden = marked.length === 0;
+    previousBookmark.hidden = marked.length === 0;
+    bookmarkNavigation.hidden = marked.length === 0;
     updateDestination();
     count.textContent = String(items.length);
     const pages = Math.max(1, Math.ceil(items.length / 5)); page = Math.min(page, pages);
@@ -150,8 +162,11 @@
   prev.addEventListener('click', () => { page--; render(); });
   next.addEventListener('click', () => { page++; render(); });
   function updateDestination() {
-    const target = upcoming(markedHeadings());
-    nextBookmark.title = target ? `이동할 북마크: ${target.item.heading}` : '이 글에 저장된 북마크가 없습니다.';
+    const marked = markedHeadings();
+    [[nextBookmark, 1], [previousBookmark, -1]].forEach(([button, direction]) => {
+      const target = destination(marked, direction);
+      button.title = target ? `이동할 북마크: ${target.item.heading}` : '이 글에 저장된 북마크가 없습니다.';
+    });
   }
   let navigationFrame = 0;
   function scheduleDestination() {
