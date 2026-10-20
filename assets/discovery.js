@@ -9,7 +9,7 @@
   };
   let opener;
   function open(dialog, source) {
-    if (search.open || preview.open) return;
+    if (document.querySelector('dialog[open]')) return;
     opener = source || document.activeElement;
     dialog.showModal();
   }
@@ -28,56 +28,73 @@
   const status = search.querySelector('[data-search-status]');
   const results = search.querySelector('.quick-results');
   const tags = search.querySelector('.quick-tags');
-  let indexPromise, generation = 0, timer;
-  function loadIndex() {
-    if (!indexPromise) indexPromise = fetch(search.dataset.searchUrl).then(response => {
-      if (!response.ok) throw Error('Search unavailable');
-      return response.json();
-    }).then(posts => posts.map(post => ({ ...post, tags: (post.tags || []).flat(),
-      heading: normalize([post.title, ...(post.tags || []).flat()].join(' ')), body: normalize(post.content) })))
-      .catch(error => { indexPromise = null; throw error; });
-    return indexPromise;
-  }
+  const year = search.querySelector('[data-search-year]');
+  const tag = search.querySelector('[data-search-tag]');
+  const pager = search.querySelector('.search-pagination');
+  let generation = 0, timer, page = 1, total = 0;
   async function runSearch() {
     const current = ++generation;
-    const terms = normalize(input.value).split(/\s+/).filter(Boolean);
-    results.replaceChildren(); tags.replaceChildren();
-    if (!terms.length) { status.textContent = '검색어를 입력하세요.'; return; }
+    const query = input.value.trim();
+    results.replaceChildren(); tags.replaceChildren(); pager.hidden = true;
+    if (!query && !year.value && !tag.value) { status.textContent = '검색어를 입력하거나 연도·태그를 선택하세요.'; return; }
     status.textContent = '글을 검색하고 있습니다…';
     try {
-      const posts = await loadIndex();
+      const found = await window.OrbitSearch.search(query, {year:year.value, tag:tag.value}, page);
       if (current !== generation || !search.open) return;
-      const matches = value => terms.every(term => value.includes(term));
-      const headings = posts.filter(post => matches(post.heading));
-      const headingSet = new Set(headings);
-      const found = [...headings, ...posts.filter(post => !headingSet.has(post) && matches(`${post.heading} ${post.body}`))];
-      const tagMatches = [...new Set(posts.flatMap(post => post.tags))].filter(tag => matches(normalize(tag)));
-      tagMatches.slice(0, 6).forEach(tag => {
-        const url = safeURL(search.dataset.tagsUrl); if (!url) return;
-        url.hash = tag;
-        const link = document.createElement('a'); link.href = url.href; link.textContent = `# ${tag}`; tags.append(link);
-      });
-      found.slice(0, 12).forEach(post => {
+      total = found.total;
+      found.posts.forEach(post => {
         const url = safeURL(post.url); if (!url) return;
-        const item = document.createElement('li');
-        const link = document.createElement('a'); link.href = url.href;
-        const title = document.createElement('strong'); title.textContent = post.title;
-        const detail = document.createElement('small'); detail.textContent = [post.date, ...post.tags.slice(0, 2)].join(' · ');
-        link.append(title, detail); item.append(link); results.append(item);
+        const row = document.createElement('li'), link = document.createElement('a');
+        link.href = url.href;
+        const title = document.createElement('strong'); window.OrbitSearch.markText(title, post.title, query);
+        const detail = document.createElement('small'); detail.textContent = [post.date, ...post.tags.slice(0,2)].filter(Boolean).join(' · ');
+        const excerpt = document.createElement('p'); excerpt.className = 'search-excerpt';
+        window.OrbitSearch.markExcerpt(excerpt, post.excerpt, query, post.richExcerpt);
+        link.append(title, detail, excerpt); row.append(link);
+        post.sections.slice(0,2).forEach(section => {
+          const target = safeURL(section.url); if (!target || !target.hash || target.pathname !== url.pathname) return;
+          const jump = document.createElement('a'); jump.className = 'search-section'; jump.href = target.href;
+          jump.textContent = `↳ ${section.title}`; row.append(jump);
+        });
+        results.append(row);
       });
-      status.textContent = found.length ? `${found.length}개의 글${found.length > 12 ? ' · 상위 12개 표시' : ''}${tagMatches.length ? ` · 일치하는 태그 ${tagMatches.length}개` : ''}` : '검색 결과가 없습니다. 다른 검색어를 입력해 보세요.';
-    } catch { if (current === generation && search.open) status.textContent = '검색을 불러오지 못했습니다. 검색어를 다시 입력하거나 Enter로 재시도해 주세요.'; }
+      const pages = Math.max(1, Math.ceil(total / 5));
+      pager.hidden = pages <= 1;
+      pager.querySelector('[data-search-prev]').disabled = page <= 1;
+      pager.querySelector('[data-search-next]').disabled = page >= pages;
+      pager.querySelector('[data-search-page]').textContent = `${page} / ${pages}`;
+      status.textContent = total ? `${total}개의 글 · ${page} / ${pages} 페이지` : '검색 결과가 없습니다. 검색어나 필터를 바꿔보세요.';
+      results.scrollTop = 0;
+    } catch {
+      if (current === generation && search.open) status.textContent = '검색을 불러오지 못했습니다. Enter로 재시도해 주세요.';
+    }
   }
-  function openSearch(source) { open(search, source); input.focus(); runSearch(); }
+  [year, tag].forEach(control => control.addEventListener('change', () => { page = 1; runSearch(); }));
+  search.querySelector('[data-search-reset]').addEventListener('click', () => { input.value = ''; year.value = ''; tag.value = ''; page = 1; runSearch(); input.focus(); });
+  pager.querySelector('[data-search-prev]').addEventListener('click', () => { if (page > 1) { page--; runSearch(); } });
+  pager.querySelector('[data-search-next]').addEventListener('click', () => { if (page * 5 < total) { page++; runSearch(); } });
+  const sidebarInput = document.querySelector('.sidebar-search input');
+  sidebarInput?.addEventListener('input', event => {
+    if (event.isComposing) return;
+    input.value = sidebarInput.value; page = 1; openSearch(sidebarInput);
+  });
+  sidebarInput?.addEventListener('keydown', event => {
+    if (event.key === 'Enter') { event.preventDefault(); input.value = sidebarInput.value; page = 1; openSearch(sidebarInput); }
+  });
+  function openSearch(source) {
+    if (!search.open && document.querySelector('dialog[open]')) return;
+    open(search, source); input.focus(); runSearch();
+  }
   document.querySelectorAll('.quick-search-trigger').forEach(button => {
     button.hidden = false; button.addEventListener('click', () => openSearch(button));
   });
   document.addEventListener('keydown', event => {
     if (event.isComposing || event.repeat || event.altKey || !(event.ctrlKey || event.metaKey) || event.key.toLowerCase() !== 'k') return;
-    event.preventDefault(); if (preview.open) return;
+    if (!search.open && document.querySelector('dialog[open]')) return;
+    event.preventDefault();
     if (search.open) search.close(); else openSearch(document.activeElement);
   });
-  input.addEventListener('input', () => { ++generation; clearTimeout(timer); timer = setTimeout(runSearch, 140); });
+  input.addEventListener('input', () => { page = 1; ++generation; clearTimeout(timer); timer = setTimeout(runSearch, 180); });
   input.addEventListener('keydown', event => { if (event.key === 'Enter' && !event.isComposing) { event.preventDefault(); clearTimeout(timer); runSearch(); } });
   search.addEventListener('close', () => { ++generation; clearTimeout(timer); });
 
@@ -91,7 +108,7 @@
   preview.addEventListener('close', () => { ++previewGeneration; previewRequest?.abort(); });
   document.addEventListener('click', async event => {
     const button = event.target.closest('.post-preview');
-    if (!button || preview.open || search.open) return;
+    if (!button || document.querySelector('dialog[open]')) return;
     const card = button.closest('.post-entry');
     const link = card?.querySelector('.post-title a');
     const url = safeURL(link?.href); if (!url) return;

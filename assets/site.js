@@ -259,63 +259,6 @@
     startListing();
   }
 
-  const search = document.querySelector('.sidebar-search');
-  if (search) {
-    const input = search.querySelector('input');
-    const results = search.querySelector('.search-results');
-    const status = search.querySelector('[role="status"]');
-    let indexPromise;
-    let timer;
-    let generation = 0;
-    function loadIndex() {
-      if (!indexPromise) {
-        indexPromise = fetch(search.dataset.searchUrl).then((response) => {
-          if (!response.ok) throw new Error('Search index unavailable');
-          return response.json();
-        }).then((posts) => posts.map((post) => ({ ...post,
-          heading: normalize([post.title, ...(post.tags || []).flat()].join(' ')),
-          body: normalize(post.content) }))).catch((error) => { indexPromise = null; throw error; });
-      }
-      return indexPromise;
-    }
-    async function runSearch() {
-      const current = ++generation;
-      const terms = termsFor(input.value);
-      results.replaceChildren(); results.hidden = true;
-      if (!terms.length) { status.textContent = ''; return; }
-      status.textContent = '검색 중…';
-      try {
-        const index = await loadIndex();
-        if (current !== generation) return;
-        const headingMatches = index.filter((post) => matches(post.heading, terms));
-        const headingSet = new Set(headingMatches);
-        const bodyMatches = index.filter((post) => !headingSet.has(post) && matches(`${post.heading} ${post.body}`, terms));
-        const found = [...headingMatches, ...bodyMatches];
-        found.slice(0, 12).forEach((post) => {
-          const url = new URL(post.url, location.href);
-          if (url.origin !== location.origin) return;
-          const item = document.createElement('li');
-          const link = document.createElement('a');
-          const date = document.createElement('small');
-          link.href = url.href; link.textContent = post.title;
-          date.textContent = post.date; link.append(date); item.append(link); results.append(item);
-        });
-        results.hidden = !found.length;
-        status.textContent = found.length ? `${found.length}개 검색됨${found.length > 12 ? ' · 상위 12개 표시' : ''}` : '검색 결과가 없습니다.';
-      } catch {
-        if (current === generation) status.textContent = '검색을 불러오지 못했습니다. 다시 입력해 주세요.';
-      }
-    }
-    input.addEventListener('input', () => {
-      ++generation; clearTimeout(timer); timer = setTimeout(runSearch, 160);
-    });
-    input.addEventListener('keydown', (event) => {
-      if (event.key === 'Escape') {
-        ++generation; clearTimeout(timer); input.value = ''; status.textContent = ''; results.replaceChildren(); results.hidden = true;
-      }
-    });
-  }
-
   const toc = document.querySelector('.toc-wrapper');
   if (toc) {
     // Small screens keep their explicitly expandable table of contents.

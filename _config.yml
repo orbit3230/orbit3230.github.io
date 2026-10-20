@@ -26,6 +26,10 @@ exclude:
   - LICENSE.md
   - README.md
   - scripts/
+  - node_modules/
+  - package.json
+  - pnpm-lock.yaml
+  - tests/
   - comment-service/
 
 # Optimize Jekyl SEO Tag

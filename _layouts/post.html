@@ -2,11 +2,14 @@
 layout: default
 ---
 
-<article class="post">
+<article class="post" data-pagefind-body>
   <header class="post-header">
-  <a class="back-link" href="{{ '/' | relative_url }}">← 전체 기록으로</a>
-  <h1 class="post-title">{{ page.title }}</h1>
-  <div class="post-meta">
+  <span hidden data-pagefind-ignore data-pagefind-filter="year" data-pagefind-meta="year">{{ page.date | date: '%Y' }}</span>
+  <span hidden data-pagefind-ignore data-pagefind-meta="date">{{ page.date | date: '%Y-%m-%d' }}</span>
+  {% for tag in page.tags %}<span hidden data-pagefind-ignore data-pagefind-filter="tag">{{ tag | escape }}</span>{% endfor %}
+  <a class="back-link" data-pagefind-ignore href="{{ '/' | relative_url }}">← 전체 기록으로</a>
+  <h1 class="post-title" data-pagefind-meta="title">{{ page.title }}</h1>
+  <div class="post-meta" data-pagefind-ignore>
     {%- assign date_format = site.date_format | default: "%Y.%m.%d" -%}
     <a href="{{ '/dates/' | relative_url }}#{{ page.date | date: '%Y' }}"><time datetime="{{ page.date | date_to_xmlschema }}" itemprop="datePublished">{{ page.date | date: date_format }}</time></a>
     {%- if page.last_modified_at -%}
@@ -28,7 +31,7 @@ layout: default
   </div>
 
   </header>
-  <div class="reading-toolbar" hidden role="group" aria-label="읽기 설정">
+  <div class="reading-toolbar" data-pagefind-ignore hidden role="group" aria-label="읽기 설정">
     <button type="button" data-focus-reading aria-pressed="false">집중해서 읽기</button>
     <label>글자 크기 <select data-reading-size aria-label="글자 크기"><option value="16">기본</option><option value="18">크게</option><option value="20">더 크게</option></select></label>
     <label>줄 간격 <select data-reading-spacing aria-label="줄 간격"><option value="1.85">기본</option><option value="2.1">넓게</option></select></label>
