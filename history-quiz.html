@@ -9,7 +9,7 @@ quiz: true
   <p id="hq-notice" class="hq-notice" role="status" aria-live="polite"></p>
   <div id="hq-home" class="hq-home">
     <button type="button" id="hq-create-entry" class="hq-entry"><span class="hq-entry-icon" aria-hidden="true">＋</span><strong>문제 만들기</strong><span>시대와 키워드로 나만의 문제를 쌓아보세요.</span><small>관리자 인증 <span aria-hidden="true">↗</span></small></button>
-    <button type="button" id="hq-play-entry" class="hq-entry"><span class="hq-entry-icon" aria-hidden="true">↓</span><strong>문제 풀기</strong><span>하나의 키워드, 하나의 정답. 차근차근 확인하세요.</span><small>누구나 참여 <span aria-hidden="true">↗</span></small></button>
+    <button type="button" id="hq-play-entry" class="hq-entry"><span class="hq-entry-icon" aria-hidden="true">↓</span><strong>문제 풀기</strong><span>키워드에 연결된 정답들을 차근차근 확인하세요.</span><small>누구나 참여 <span aria-hidden="true">↗</span></small></button>
   </div>
   <section id="hq-groups" hidden aria-labelledby="hq-groups-title">
     <div class="hq-bar"><button type="button" class="hq-back">← 처음으로</button><span class="hq-badge" id="hq-groups-mode"></span><button type="button" id="hq-groups-refresh">새로고침</button></div>
@@ -23,9 +23,9 @@ quiz: true
       <div class="hq-era"><span class="hq-label">시대</span><div class="hq-select" data-kind="era"></div></div>
       <div class="hq-editor-grid">
         <label class="hq-field"><span>키워드</span><input id="hq-keyword" maxlength="500" required autocomplete="off" placeholder="예: 의정부 서사제"></label>
-        <div class="hq-field"><div class="hq-select" data-kind="type"></div><label for="hq-solution" class="hq-sr-only">정답</label><input id="hq-solution" maxlength="120" required autocomplete="off" placeholder="예: 세종"></div>
+        <div class="hq-answer-editor"><div id="hq-editor-answers"><div class="hq-field hq-editor-answer"><div class="hq-select" data-kind="type"></div><label for="hq-solution" class="hq-sr-only">정답 1</label><input id="hq-solution" maxlength="120" required autocomplete="off" placeholder="예: 세종"></div></div><button type="button" id="hq-answer-add" aria-label="정답 항목 추가">＋ 정답 항목 추가</button></div>
       </div>
-      <p class="hq-helper">정답의 띄어쓰기가 빈칸에 반영됩니다. Enter로 연속해서 만들 수 있어요.</p>
+      <p class="hq-helper">정답 항목은 최대 10개까지 추가할 수 있습니다. 생성 후에는 첫 항목만 남겨 다음 문제를 준비합니다.</p>
       <div class="hq-actions"><button type="submit" id="hq-create-submit" class="hq-primary">생성</button><button type="button" id="hq-edit-cancel" hidden>수정 취소</button></div>
       <p id="hq-save-status" role="status" aria-live="polite"></p>
     </form>
@@ -35,13 +35,14 @@ quiz: true
     <div class="hq-bar"><button type="button" class="hq-back">← 처음으로</button><span class="hq-badge">문제 풀기</span><button type="button" id="hq-sound" aria-pressed="false">타건음 꺼짐</button></div>
     <div class="hq-current-group"><span><small>선택한 그룹</small><strong id="hq-play-group"></strong></span><button type="button" class="hq-group-switch">그룹 변경</button></div>
     <div class="hq-play-filter"><label for="hq-filter">시대 선택</label><select id="hq-filter"><option value="0">모든 시대</option></select><button type="button" id="hq-retry">문제 불러오기</button></div>
+    <p id="hq-priority" class="hq-helper" aria-live="polite"></p>
+    <p id="hq-progress-note" class="hq-stat-note">아직 한 번도 맞히지 못한 문제를 먼저 출제합니다. 내 풀이 기록은 같은 브라우저에서 이어집니다.</p>
     <div id="hq-empty" class="hq-card" hidden><h2>아직 문제가 없습니다.</h2><p>선택한 그룹과 시대에 해당하는 문제가 없습니다. 다른 그룹이나 시대를 선택해 주세요.</p></div>
     <form id="hq-answer-form" class="hq-card hq-play-card" hidden>
       <p id="hq-play-era" class="hq-play-era"></p><h2 id="hq-clue"></h2>
       <div class="hq-bridge"><dl class="hq-counts"><div><dt>정답</dt><dd id="hq-correct">0회</dd></div><div><dt>오답</dt><dd id="hq-wrong">0회</dd></div></dl><span class="hq-arrow" aria-hidden="true">↓</span><div class="hq-rate"><span>정답률</span><strong id="hq-rate">—</strong></div></div>
-      <div class="hq-answer-line"><span id="hq-answer-type" class="hq-answer-type"></span><div id="hq-slots" aria-hidden="true"></div><p id="hq-reveal" hidden></p></div>
-      <label class="hq-sr-only" for="hq-answer">정답 입력</label><input id="hq-answer" class="hq-answer-input" maxlength="240" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="정답을 입력하세요" aria-describedby="hq-answer-help hq-result">
-      <p id="hq-answer-help" class="hq-helper">빈칸은 정답의 글자 수와 띄어쓰기를 보여줍니다.</p>
+      <div id="hq-play-answers"></div>
+      <p id="hq-answer-help" class="hq-helper">각 항목에 답을 입력하세요. 모든 항목을 맞혀야 정답으로 기록됩니다.</p>
       <p id="hq-result" role="status" aria-live="polite"></p>
       <div class="hq-actions"><button type="submit" id="hq-check" class="hq-primary">정답 확인</button><button type="button" id="hq-next">다음 문제 →</button></div>
       <p class="hq-stat-note">전체 방문자의 풀이 횟수입니다. 정답·오답은 제출할 때 한 번 집계됩니다.</p>
