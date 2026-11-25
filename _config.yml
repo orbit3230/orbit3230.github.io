@@ -31,6 +31,7 @@ exclude:
   - pnpm-lock.yaml
   - tests/
   - comment-service/
+  - quiz-service/
 
 # Optimize Jekyl SEO Tag
 logo: logo.png
@@ -70,3 +71,7 @@ media:
 comments:
   enabled: true
   api_url: "https://orbit-blog-comments.orbit3230.workers.dev/comments"
+
+# Separate, persistent Korean history quiz service.
+quiz:
+  api_url: "https://orbit-history-quiz.orbit3230.workers.dev"

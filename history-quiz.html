@@ -1,0 +1,55 @@
+---
+layout: default
+title: 한국사 퀴즈
+permalink: /history-quiz/
+quiz: true
+---
+<section class="history-quiz" id="history-quiz" data-api="{{ site.quiz.api_url | escape }}">
+  <header class="hq-header"><span class="hq-eyebrow">KOREAN HISTORY · QUIZ</span><h1>한국사 퀴즈</h1><p>키워드를 읽고, 기억 속의 정답을 꺼내보세요.</p></header>
+  <p id="hq-notice" class="hq-notice" role="status" aria-live="polite"></p>
+  <div id="hq-home" class="hq-home">
+    <button type="button" id="hq-create-entry" class="hq-entry"><span class="hq-entry-icon" aria-hidden="true">＋</span><strong>문제 만들기</strong><span>시대와 키워드로 나만의 문제를 쌓아보세요.</span><small>관리자 인증 <span aria-hidden="true">↗</span></small></button>
+    <button type="button" id="hq-play-entry" class="hq-entry"><span class="hq-entry-icon" aria-hidden="true">↓</span><strong>문제 풀기</strong><span>하나의 키워드, 하나의 정답. 차근차근 확인하세요.</span><small>누구나 참여 <span aria-hidden="true">↗</span></small></button>
+  </div>
+  <section id="hq-groups" hidden aria-labelledby="hq-groups-title">
+    <div class="hq-bar"><button type="button" class="hq-back">← 처음으로</button><span class="hq-badge" id="hq-groups-mode"></span><button type="button" id="hq-groups-refresh">새로고침</button></div>
+    <div class="hq-group-heading"><div><h2 id="hq-groups-title" tabindex="-1">문제 그룹 선택</h2><p id="hq-groups-help" class="hq-helper"></p></div><button type="button" id="hq-group-add" class="hq-primary">＋ 그룹 만들기</button></div>
+    <div id="hq-group-list" class="hq-group-list" aria-live="polite"></div>
+  </section>
+  <section id="hq-create" hidden aria-label="문제 만들기">
+    <div class="hq-bar"><button type="button" class="hq-back">← 처음으로</button><span class="hq-badge">문제 만들기</span><button type="button" id="hq-logout">로그아웃</button></div>
+    <div class="hq-current-group"><span><small>선택한 그룹</small><strong id="hq-create-group"></strong></span><button type="button" class="hq-group-switch">그룹 변경</button></div>
+    <form id="hq-create-form" class="hq-card">
+      <div class="hq-era"><span class="hq-label">시대</span><div class="hq-select" data-kind="era"></div></div>
+      <div class="hq-editor-grid">
+        <label class="hq-field"><span>키워드</span><input id="hq-keyword" maxlength="500" required autocomplete="off" placeholder="예: 의정부 서사제"></label>
+        <div class="hq-field"><div class="hq-select" data-kind="type"></div><label for="hq-solution" class="hq-sr-only">정답</label><input id="hq-solution" maxlength="120" required autocomplete="off" placeholder="예: 세종"></div>
+      </div>
+      <p class="hq-helper">정답의 띄어쓰기가 빈칸에 반영됩니다. Enter로 연속해서 만들 수 있어요.</p>
+      <div class="hq-actions"><button type="submit" id="hq-create-submit" class="hq-primary">생성</button><button type="button" id="hq-edit-cancel" hidden>수정 취소</button></div>
+      <p id="hq-save-status" role="status" aria-live="polite"></p>
+    </form>
+    <details class="hq-manage"><summary>저장한 문제 관리</summary><p class="hq-helper">문제를 수정하면 해당 문제의 정답·오답 통계가 초기화됩니다.</p><button type="button" id="hq-refresh">새로고침</button><div id="hq-question-list"></div><nav class="hq-pages" aria-label="관리 문제 페이지"><button type="button" id="hq-prev">이전</button><span id="hq-page"></span><button type="button" id="hq-more">다음</button></nav></details>
+  </section>
+  <section id="hq-play" hidden aria-label="문제 풀기">
+    <div class="hq-bar"><button type="button" class="hq-back">← 처음으로</button><span class="hq-badge">문제 풀기</span><button type="button" id="hq-sound" aria-pressed="false">타건음 꺼짐</button></div>
+    <div class="hq-current-group"><span><small>선택한 그룹</small><strong id="hq-play-group"></strong></span><button type="button" class="hq-group-switch">그룹 변경</button></div>
+    <div class="hq-play-filter"><label for="hq-filter">시대 선택</label><select id="hq-filter"><option value="0">모든 시대</option></select><button type="button" id="hq-retry">문제 불러오기</button></div>
+    <div id="hq-empty" class="hq-card" hidden><h2>아직 문제가 없습니다.</h2><p>선택한 그룹과 시대에 해당하는 문제가 없습니다. 다른 그룹이나 시대를 선택해 주세요.</p></div>
+    <form id="hq-answer-form" class="hq-card hq-play-card" hidden>
+      <p id="hq-play-era" class="hq-play-era"></p><h2 id="hq-clue"></h2>
+      <div class="hq-bridge"><dl class="hq-counts"><div><dt>정답</dt><dd id="hq-correct">0회</dd></div><div><dt>오답</dt><dd id="hq-wrong">0회</dd></div></dl><span class="hq-arrow" aria-hidden="true">↓</span><div class="hq-rate"><span>정답률</span><strong id="hq-rate">—</strong></div></div>
+      <div class="hq-answer-line"><span id="hq-answer-type" class="hq-answer-type"></span><div id="hq-slots" aria-hidden="true"></div><p id="hq-reveal" hidden></p></div>
+      <label class="hq-sr-only" for="hq-answer">정답 입력</label><input id="hq-answer" class="hq-answer-input" maxlength="240" autocomplete="off" autocapitalize="off" spellcheck="false" placeholder="정답을 입력하세요" aria-describedby="hq-answer-help hq-result">
+      <p id="hq-answer-help" class="hq-helper">빈칸은 정답의 글자 수와 띄어쓰기를 보여줍니다.</p>
+      <p id="hq-result" role="status" aria-live="polite"></p>
+      <div class="hq-actions"><button type="submit" id="hq-check" class="hq-primary">정답 확인</button><button type="button" id="hq-next">다음 문제 →</button></div>
+      <p class="hq-stat-note">전체 방문자의 풀이 횟수입니다. 정답·오답은 제출할 때 한 번 집계됩니다.</p>
+    </form>
+  </section>
+  <dialog id="hq-group-dialog" class="hq-dialog" aria-labelledby="hq-group-title"><form id="hq-group-form"><div class="hq-dialog-top"><h2 id="hq-group-title">문제 그룹 만들기</h2><button type="button" data-close aria-label="닫기">×</button></div><label for="hq-group-name">그룹 이름</label><input id="hq-group-name" maxlength="60" required autocomplete="off" placeholder="예: 한국사 심화 · 조선"><p id="hq-group-error" role="alert"></p><button type="submit" class="hq-primary">만들고 시작</button></form></dialog>
+  <dialog id="hq-auth" class="hq-dialog" aria-labelledby="hq-auth-title"><form id="hq-auth-form"><div class="hq-dialog-top"><h2 id="hq-auth-title">관리자 인증</h2><button type="button" data-close aria-label="닫기">×</button></div><p id="hq-auth-help"></p><label for="hq-password">관리자 비밀번호</label><input id="hq-password" type="password" minlength="8" maxlength="128" required autocomplete="current-password"><p id="hq-auth-error" role="alert"></p><button type="submit" class="hq-primary" id="hq-auth-submit">접속</button></form></dialog>
+  <dialog id="hq-add" class="hq-dialog" aria-labelledby="hq-add-title"><form id="hq-add-form"><div class="hq-dialog-top"><h2 id="hq-add-title">항목 추가</h2><button type="button" data-close aria-label="닫기">×</button></div><label for="hq-category-name">항목 이름</label><input id="hq-category-name" maxlength="30" required autocomplete="off"><p id="hq-add-error" role="alert"></p><button type="submit" class="hq-primary">추가</button></form></dialog>
+  <dialog id="hq-delete-dialog" class="hq-dialog" aria-labelledby="hq-delete-title"><div class="hq-dialog-top"><h2 id="hq-delete-title">문제 삭제</h2><button type="button" data-close aria-label="닫기">×</button></div><p>이 문제를 풀이 목록에서 숨길까요? 저장된 기록은 서버에 보관됩니다.</p><p id="hq-delete-error" role="alert"></p><button type="button" id="hq-delete-confirm">삭제</button></dialog>
+  <noscript>퀴즈를 이용하려면 브라우저에서 JavaScript를 허용해 주세요.</noscript>
+</section>

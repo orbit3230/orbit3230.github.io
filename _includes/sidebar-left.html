@@ -7,6 +7,7 @@
     <a href="{{ '/dates/' | relative_url }}" {% if page.url == '/dates/' %}aria-current="page"{% endif %}>{% include icon.html name='calendar' %}<span class="nav-text"><span>연도별</span> <span>탐색</span></span></a>
     <a href="{{ '/tags/' | relative_url }}" {% if page.url == '/tags/' %}aria-current="page"{% endif %}>{% include icon.html name='tag' %}<span class="nav-text"><span>태그별</span> <span>탐색</span></span></a>
     <a href="{{ '/about/' | relative_url }}" {% if page.url == '/about/' %}aria-current="page"{% endif %}>{% include icon.html name='user' %}<span class="nav-text"><span>블로그</span> <span>소개</span></span></a>
+    <a href="{{ '/history-quiz/' | relative_url }}" {% if page.quiz %}aria-current="page"{% endif %}><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="1.6" aria-hidden="true"><path d="M5 4h14v16H5zM8 8h8M8 12h5M8 16h3"/></svg><span class="nav-text"><span>한국사</span> <span>퀴즈</span></span></a>
   </nav>
   {% include search-box.html %}
   <button type="button" class="quick-search-trigger" hidden>빠른 검색 <kbd>Ctrl / ⌘ K</kbd></button>

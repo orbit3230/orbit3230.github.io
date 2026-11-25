@@ -53,3 +53,9 @@ node_modules
 comment-service/.wrangler/
 comment-service/.dev.vars*
 comment-service/.env*
+
+# Quiz local credentials and generated Cloudflare state
+quiz-service/.wrangler/
+quiz-service/.dev.vars*
+quiz-service/.env*
+quiz-service/.private/
