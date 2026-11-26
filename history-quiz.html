@@ -29,7 +29,7 @@ quiz: true
       <div class="hq-actions"><button type="submit" id="hq-create-submit" class="hq-primary">생성</button><button type="button" id="hq-edit-cancel" hidden>수정 취소</button></div>
       <p id="hq-save-status" role="status" aria-live="polite"></p>
     </form>
-    <details class="hq-manage"><summary>저장한 문제 관리</summary><p class="hq-helper">문제를 수정하면 해당 문제의 정답·오답 통계가 초기화됩니다.</p><button type="button" id="hq-refresh">새로고침</button><div id="hq-question-list"></div><nav class="hq-pages" aria-label="관리 문제 페이지"><button type="button" id="hq-prev">이전</button><span id="hq-page"></span><button type="button" id="hq-more">다음</button></nav></details>
+    <details class="hq-manage" id="hq-manage"><summary>저장한 문제 관리</summary><p class="hq-helper">문제를 수정하면 해당 문제의 정답·오답 통계가 초기화됩니다.</p><button type="button" id="hq-refresh">새로고침</button><p id="hq-manage-status" class="hq-helper" role="status"></p><div id="hq-question-list"></div><nav class="hq-pages" aria-label="관리 문제 페이지"><button type="button" id="hq-prev">이전</button><span id="hq-page"></span><button type="button" id="hq-more">다음</button></nav></details>
   </section>
   <section id="hq-play" hidden aria-label="문제 풀기">
     <div class="hq-bar"><button type="button" class="hq-back">← 처음으로</button><span class="hq-badge">문제 풀기</span><button type="button" id="hq-sound" aria-pressed="false">타건음 꺼짐</button></div>

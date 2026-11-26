@@ -7,7 +7,7 @@
   let token='',setupToken=new URLSearchParams(location.hash.slice(1)).get('setup')||'',catalog={eras:[],types:[]},selected={era:null,type:null};
   let authState=null,categoryKind='',categoryMenu='',edit=null,deleteTarget=null,managePage=1,question=null,attempt='',answered=false,composing=false,compositionEnd=0,sound=false,audio=null,nextBusy=false;
   let groupMode='play',activeGroup=null,groupBusy=false,answerBusy=false,viewVersion=0;
-  let editorSerial=1,playRows=[],player='';
+  let editorSerial=1,playRows=[],player='',manageDirty=true,manageGeneration=0;
   try{player=localStorage.getItem('orbit-quiz-player')||'';}catch{}
   if(!/^[a-f0-9]{64}$/.test(player)){player=[...crypto.getRandomValues(new Uint8Array(32))].map(v=>v.toString(16).padStart(2,'0')).join('');}
   try{localStorage.setItem('orbit-quiz-player',player);}catch{$('progress-note').textContent='브라우저 저장소를 사용할 수 없어 내 풀이 기록은 이 화면을 열어 둔 동안만 이어집니다.';}
@@ -26,7 +26,12 @@
     }catch(error){if(error.name==='AbortError'||error instanceof TypeError)throw Error('연결이 지연되었습니다. 입력 내용은 그대로 두었으니 다시 시도해 주세요.');throw error;}
     finally{clearTimeout(timer);}
   }
-  async function busy(button,task){if(button.disabled)return;button.disabled=true;try{await task();}finally{button.disabled=false;}}
+  async function busy(button,task){
+    if(button.disabled)return;button.disabled=true;button.setAttribute('aria-busy','true');
+    const original=button.textContent,label=button.id==='hq-create-submit'?'저장 중…':button.id==='hq-check'?'채점 중…':button.id==='hq-auth-submit'?'인증 중…':button.closest('#hq-add-form,#hq-group-form')?'추가 중…':null;
+    if(label)button.textContent=label;
+    try{await task();}finally{button.disabled=false;button.removeAttribute('aria-busy');if(label&&button.textContent===label)button.textContent=original;}
+  }
   function screen(name){viewVersion++;for(const id of ['home','groups','create','play'])$(id).hidden=id!==name;notice('');closeMenus();}
   async function leave(){if(groupBusy||nextBusy||answerBusy)return;const old=token;token='';if(old)fetch(apiRoot+'/logout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+old},body:'{}',credentials:'omit',referrerPolicy:'no-referrer'}).catch(()=>{});screen('home');}
   root.querySelectorAll('.hq-back').forEach(button=>button.addEventListener('click',leave));$('logout').addEventListener('click',leave);
@@ -69,7 +74,8 @@
   }
   $('answer-add').addEventListener('click',()=>{const row=addAnswer();if(row)menus[row.key].trigger.focus();});
   updateEditorLabels();
-  async function loadCatalog(){catalog=await api('/catalog');renderMenus();const current=$('filter').value;$('filter').replaceChildren(new Option('모든 시대','0'));for(const item of catalog.eras)$('filter').append(new Option(item.name,String(item.id)));$('filter').value=[...$('filter').options].some(item=>item.value===current)?current:'0';}
+  async function loadCatalog(){catalog=await api('/catalog');applyCatalog();}
+  function applyCatalog(){renderMenus();const current=$('filter').value;$('filter').replaceChildren(new Option('모든 시대','0'));for(const item of catalog.eras)$('filter').append(new Option(item.name,String(item.id)));$('filter').value=[...$('filter').options].some(item=>item.value===current)?current:'0';}
   async function openAuth(){
     $('auth-error').textContent='';$('password').value='';
     try{
@@ -89,7 +95,7 @@
       const result=await api(authState.initialized?'/login':'/setup',{salt,key,...(authState.initialized?{}:{setup_token:setupToken})});token=result.token;setupToken='';$('auth').close();await openGroups('create');
     }catch(error){if(error.status===409){authState=await api('/status').catch(()=>authState);if(authState.initialized){$('auth-title').textContent='관리자 인증';$('auth-submit').textContent='접속';}}if($('auth').open)$('auth-error').textContent=error.message;else notice(error.message);}
   });});
-  $('add-form').addEventListener('submit',event=>{event.preventDefault();if(composing)return;busy($('add-form').querySelector('[type=submit]'),async()=>{try{const result=await api('/categories',{kind:categoryKind,name:$('category-name').value},true);selected[categoryMenu]=result.category.id;await loadCatalog();$('add').close();menus[categoryMenu].trigger.focus();}catch(error){$('add-error').textContent=error.message;}});});
+  $('add-form').addEventListener('submit',event=>{event.preventDefault();if(composing)return;busy($('add-form').querySelector('[type=submit]'),async()=>{try{const result=await api('/categories',{kind:categoryKind,name:$('category-name').value},true);selected[categoryMenu]=result.category.id;const options=categoryKind==='era'?catalog.eras:catalog.types;if(!options.some(item=>item.id===result.category.id))options.push(result.category);options.sort((a,b)=>a.id-b.id);applyCatalog();$('add').close();menus[categoryMenu].trigger.focus();}catch(error){$('add-error').textContent=error.message;}});});
   function cancelEdit(){edit=null;$('create-submit').textContent='생성';$('edit-cancel').hidden=true;$('keyword').value='';resetAnswers();createRequest={signature:'',id:''};}
   $('edit-cancel').addEventListener('click',cancelEdit);
   $('create-form').addEventListener('submit',event=>{event.preventDefault();if(composing)return;busy($('create-submit'),async()=>{
@@ -97,14 +103,17 @@
     if(!data.era_id||data.answers.some(part=>!part.type_id)){$('save-status').textContent='시대와 정답 종류를 선택해 주세요.';return;}
     const signature=JSON.stringify(data);if(createRequest.signature!==signature)createRequest={signature,id:crypto.randomUUID()};
     const controls=[...$('create-form').querySelectorAll('input,button'),...root.querySelectorAll('.hq-group-switch,.hq-back'),$('logout')].filter(control=>control!==$('create-submit'));
-    controls.forEach(control=>control.disabled=true);
-    try{await api('/questions',{...data,...(edit?{id:edit.id,revision:edit.revision}:{request_id:createRequest.id})},true);const wasEdit=!!edit;cancelEdit();$('save-status').textContent=wasEdit?'문제를 수정했습니다.':'문제를 저장했습니다. 다음 문제를 입력하세요.';$('keyword').focus();await loadManage();}
+    controls.forEach(control=>control.disabled=true);$('save-status').textContent='문제를 저장하고 있습니다…';
+    try{await api('/questions',{...data,...(edit?{id:edit.id,revision:edit.revision}:{request_id:createRequest.id})},true);const wasEdit=!!edit;cancelEdit();$('save-status').textContent=wasEdit?'문제를 수정했습니다.':'문제를 저장했습니다. 다음 문제를 입력하세요.';$('keyword').focus();markManageDirty();refreshManageInBackground();}
     catch(error){$('save-status').textContent=error.message;if(error.status===401)openAuth();}
     finally{controls.forEach(control=>control.disabled=false);updateEditorLabels();if(!$('keyword').value)$('keyword').focus();}
   });});
+  function markManageDirty(){manageDirty=true;manageGeneration++;}
+  function refreshManageInBackground(){if($('manage').open)loadManage().catch(()=>{$('manage-status').textContent='목록을 불러오지 못했습니다. 새로고침을 눌러 주세요.';});}
+  $('manage').addEventListener('toggle',()=>{if($('manage').open&&manageDirty)refreshManageInBackground();});
   async function loadManage(){
-    const version=viewVersion;const result=await api('/manage?group='+activeGroup.id+'&page='+managePage,undefined,true);if(version!==viewVersion)return;if(managePage>1&&!result.questions.length){managePage--;return loadManage();}
-    $('question-list').replaceChildren();
+    const generation=++manageGeneration,version=viewVersion;$('manage-status').textContent='목록을 불러오는 중…';const result=await api('/manage?group='+activeGroup.id+'&page='+managePage,undefined,true);if(version!==viewVersion||generation!==manageGeneration)return;if(managePage>1&&!result.questions.length){managePage--;return loadManage();}
+    manageDirty=false;$('manage-status').textContent='';$('question-list').replaceChildren();
     for(const item of result.questions){const row=make('article',undefined,'hq-managed-question');row.append(make('small',item.era+' · '+item.type),make('p',item.keyword),make('p',item.answers.map(part=>part.type+': '+part.answer).join(' · ')));const change=make('button','수정'),remove=make('button','삭제');change.type=remove.type='button';change.addEventListener('click',()=>{edit=item;selected.era=item.era_id;resetAnswers(item.answers);$('keyword').value=item.keyword;$('create-submit').textContent='수정 저장';$('edit-cancel').hidden=false;$('save-status').textContent='수정하면 이 문제의 풀이 통계가 초기화됩니다.';$('keyword').focus();});remove.addEventListener('click',()=>{deleteTarget=item;$('delete-error').textContent='';$('delete-dialog').showModal();});row.append(change,remove);$('question-list').append(row);}
     if(!result.total)$('question-list').append(make('p','아직 저장한 문제가 없습니다.','hq-helper'));
     $('page').textContent=`${managePage} / ${Math.max(1,Math.ceil(result.total/5))}`;$('prev').disabled=managePage===1;$('more').disabled=managePage*5>=result.total;
@@ -145,7 +154,7 @@
   $('filter').addEventListener('change',next);$('next').addEventListener('click',next);$('retry').addEventListener('click',next);
   $('answer-form').addEventListener('submit',event=>{event.preventDefault();if(composing||answered||nextBusy||!question)return;busy($('check'),async()=>{
     const empty=playRows.find(row=>!normalize(row.input.value));if(empty){$('result').textContent='모든 정답 항목을 입력해 주세요.';empty.input.focus();return;}
-    const version=viewVersion;answerBusy=true;$('next').disabled=true;$('retry').disabled=true;$('filter').disabled=true;playRows.forEach(row=>row.input.readOnly=true);
+    const version=viewVersion;answerBusy=true;$('next').disabled=true;$('retry').disabled=true;$('filter').disabled=true;playRows.forEach(row=>row.input.readOnly=true);$('result').textContent='정답을 확인하고 있습니다…';
     try{
       const result=await api('/answer',{attempt,answers:playRows.map(row=>row.input.value)});if(version!==viewVersion)return;answered=true;
       let matched=0;result.results.forEach((part,index)=>{const row=playRows[index];row.host.classList.add(part.correct?'is-correct':'is-wrong');row.feedback.textContent=part.correct?'정답':'오답';row.input.setAttribute('aria-invalid',String(!part.correct));row.reveal.hidden=part.correct;row.reveal.textContent='정답: '+part.answer;if(part.correct)matched++;});
@@ -171,7 +180,7 @@
     if(groupBusy||nextBusy)return;const version=viewVersion;groupBusy=true;
     try{await loadCatalog();if(version!==viewVersion)return;activeGroup=group;question=null;attempt='';managePage=1;cancelEdit();$('save-status').textContent='';
       $('create-group').textContent=group.name;$('play-group').textContent=group.name;
-      if(groupMode==='create'){screen('create');await loadManage();$('keyword').focus();}
+      if(groupMode==='create'){screen('create');markManageDirty();$('question-list').replaceChildren();$('page').textContent='';refreshManageInBackground();$('keyword').focus();}
       else{$('filter').value='0';$('answer-form').hidden=true;$('empty').hidden=true;screen('play');await next();}
     }finally{groupBusy=false;}
   }

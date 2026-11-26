@@ -61,3 +61,18 @@ API: `GET /status`, `GET /catalog`, `GET /groups`, `POST /groups`, `POST /setup`
 `0002_multiple_answers.sql`은 기존 `answer`, 분류, 정답·오답 횟수를 변경하지 않고 복수 정답 저장 열과 방문자별 성공 기록을 추가합니다. 기존 단일 정답 행은 읽을 때 한 항목으로 변환합니다. 운영 DB를 백업한 뒤 `npx wrangler d1 migrations apply orbit-history-quiz --remote`, 이어서 서버 배포를 수행합니다. Secret은 변경하지 않습니다.
 
 `node test.mjs`와 `node test-multiple.mjs`로 기존 기능, 복수 정답, 부분 채점, 중복 제출, 개인별 우선순위, 기존 데이터 이전을 검사합니다.
+
+
+## 응답 속도 개선 (2026-11-26)
+
+인증·요청 제한과 서로 독립적인 DB 조회를 `D1Database.batch`로 묶습니다. 항목 추가는 UPSERT RETURNING으로 저장 결과를 바로 받습니다. 관리 목록은 각 문제마다 분류를 다시 읽지 않고 한 번만 조회합니다. 채점 저장, 중복 제출 확인, 트리거 처리 후 통계 조회는 하나의 DB 배치로 처리합니다. 기존 인증·제한·중복 채점 방지·개인별 우선 출제는 유지합니다.
+
+DB 왕복 횟수: 분류 추가 5→2, 문제 저장 8→3, 5개 관리 목록 10→2, 출제 8→3, 채점 8→3. 쿼리 개수와 DB 왕복 횟수는 다릅니다. 거래 단위가 묶여 네트워크 대기를 줄입니다. DB 구조와 기존 데이터를 변경하는 마이그레이션은 없습니다.
+
+화면에서는 항목 추가 결과를 목록에 즉시 반영하여 `/catalog` 재호출을 없앴습니다. 관리 목록은 펼칠 때 조회하고, 저장 후 목록 갱신은 입력칸을 잠그지 않습니다. 저장 실패 시 입력과 요청 ID를 보존하고, 실제 저장 성공을 받기 전에는 성공으로 표시하지 않습니다. 버튼과 상태 문구는 요청 직후 대기 상태를 표시합니다.
+
+허용된 Origin의 사전 요청 결과를 최대 86400초 캐시하도록 응답합니다. 실제 데이터 응답의 `no-store` 및 Origin 검사와 쓰기 인증은 유지합니다. 브라우저별 캐시 상한은 다를 수 있습니다. `[placement] mode = "smart"`로 DB 통신에 유리한 실행 위치를 자동 선택하도록 했습니다. 위치 최적화에는 트래픽 관찰 시간이 필요하므로 즉시 효과를 보장하지 않습니다.
+
+실제 API 5회씩 측정한 `/next` 중앙값은 1444ms→864ms였습니다(같은 측정 환경, 채점 없이 측정). `/catalog`는 네트워크 변동으로 628ms→682ms였으므로 개선된 것으로 보고하지 않습니다. 저장·채점의 실제 사용자별 지연은 접속 지역과 네트워크에 따라 다릅니다. 이 수치는 브라우저 전체 사용자 경험이나 모든 요청의 보장 시간이 아닙니다. `Server-Timing`의 `app`에는 서버 처리 시간을 노출하며 비밀값은 포함하지 않습니다.
+
+참고: [D1 batch](https://developers.cloudflare.com/d1/worker-api/d1-database/#batch), [Workers Placement](https://developers.cloudflare.com/workers/configuration/placement/).

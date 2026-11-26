@@ -4,7 +4,11 @@ import {DatabaseSync} from 'node:sqlite';
 import service from './worker.mjs';
 export function harness(){
   const db=new DatabaseSync(':memory:');db.exec(fs.readFileSync(new URL('./schema.sql',import.meta.url),'utf8'));
-  const env={AUTH_PEPPER:'local-test-pepper-only-not-production',SETUP_TOKEN:'local-test-setup-only',ALLOWED_ORIGINS:'https://orbit3230.github.io,http://127.0.0.1:4008',DB:{prepare(sql){return {bind(...args){return {first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>db.prepare(sql).run(...args)};}};}}};
+  const env={AUTH_PEPPER:'local-test-pepper-only-not-production',SETUP_TOKEN:'local-test-setup-only',ALLOWED_ORIGINS:'https://orbit3230.github.io,http://127.0.0.1:4008',DB:{
+    prepare(sql){return {bind(...args){return {sql,args,first:async()=>db.prepare(sql).get(...args)||null,all:async()=>({results:db.prepare(sql).all(...args)}),run:async()=>db.prepare(sql).run(...args)};}};},
+    async batch(statements){db.exec('BEGIN');try{const results=statements.map(({sql,args})=>{const query=db.prepare(sql);return query.columns().length?{results:query.all(...args)}:{results:[],meta:query.run(...args)};});db.exec('COMMIT');return results;}catch(error){db.exec('ROLLBACK');throw error;}}
+  }};
+
   let counter=0;
   async function api(path,data,token='',options={}){const response=await service.fetch(new Request('https://quiz.test'+path,{method:data===undefined?'GET':'POST',headers:{Origin:options.origin||'https://orbit3230.github.io','CF-Connecting-IP':options.ip||'192.0.2.'+(++counter),'Content-Type':'application/json',...(token?{Authorization:'Bearer '+token}:{})},...(data===undefined?{}:{body:JSON.stringify(data)})}),env);return {status:response.status,data:await response.json()};}
   return {db,env,api};

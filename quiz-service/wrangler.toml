@@ -5,6 +5,9 @@ workers_dev = true
 preview_urls = false
 account_id = "27ab56a0d19da3701a0fcca3b6ba2a17"
 
+[placement]
+mode = "smart"
+
 [vars]
 ALLOWED_ORIGINS = "https://orbit3230.github.io,http://127.0.0.1:4000,http://localhost:4000,http://127.0.0.1:4008,http://127.0.0.1:4009"
 
