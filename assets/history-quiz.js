@@ -9,6 +9,7 @@
   let groupMode='play',activeGroup=null,groupBusy=false,answerBusy=false,viewVersion=0;
   let editorSerial=1,playRows=[],player='',manageDirty=true,manageGeneration=0;
   let pendingPlayEnter=null,playEnterTimer=null,playEnterHeld=false;
+  let authPurpose='create',quickContext=null,quickEditing=false,quickSaving=false,graded=false;
   try{player=localStorage.getItem('orbit-quiz-player')||'';}catch{}
   if(!/^[a-f0-9]{64}$/.test(player)){player=[...crypto.getRandomValues(new Uint8Array(32))].map(v=>v.toString(16).padStart(2,'0')).join('');}
   try{localStorage.setItem('orbit-quiz-player',player);}catch{$('progress-note').textContent='브라우저 저장소를 사용할 수 없어 내 풀이 기록은 이 화면을 열어 둔 동안만 이어집니다.';}
@@ -33,12 +34,12 @@
     if(label)button.textContent=label;
     try{await task();}finally{button.disabled=false;button.removeAttribute('aria-busy');if(label&&button.textContent===label)button.textContent=original;if(button===$('check'))updatePlayControls();}
   }
-  function screen(name){viewVersion++;for(const id of ['home','groups','create','play'])$(id).hidden=id!==name;notice('');closeMenus();}
-  async function leave(){if(groupBusy||nextBusy||answerBusy)return;const old=token;token='';if(old)fetch(apiRoot+'/logout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+old},body:'{}',credentials:'omit',referrerPolicy:'no-referrer'}).catch(()=>{});screen('home');}
+  function screen(name){viewVersion++;for(const id of ['home','groups','create','play'])$(id).hidden=id!==name;notice('');closeMenus();updatePlayControls();}
+  async function leave(){if(groupBusy||nextBusy||answerBusy||quickContext)return;const old=token;token='';if(old)fetch(apiRoot+'/logout',{method:'POST',headers:{'Content-Type':'application/json',Authorization:'Bearer '+old},body:'{}',credentials:'omit',referrerPolicy:'no-referrer'}).catch(()=>{});screen('home');}
   root.querySelectorAll('.hq-back').forEach(button=>button.addEventListener('click',leave));$('logout').addEventListener('click',leave);
-  root.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>button.closest('dialog').close()));
-  $('auth').addEventListener('close',()=>{$('password').value='';});
-  function playEnter(){if(nextBusy||answerBusy||$('play').hidden)return;if(answered)next();else $('answer-form').requestSubmit();}
+  root.querySelectorAll('[data-close]').forEach(button=>button.addEventListener('click',()=>{if(quickSaving)return;button.closest('dialog').close();}));
+  $('auth').addEventListener('close',()=>{$('password').value='';if(authPurpose==='quick'){quickContext=null;authPurpose='create';updatePlayControls();if(!$('next').disabled)$('next').focus({preventScroll:true});}});
+  function playEnter(){if(nextBusy||answerBusy||quickContext||$('play').hidden||root.querySelector('dialog[open]'))return;if(answered)next();else $('answer-form').requestSubmit();}
   function flushPlayEnter(){
     clearTimeout(playEnterTimer);
     playEnterTimer=setTimeout(()=>{
@@ -100,38 +101,65 @@
   updateEditorLabels();
   async function loadCatalog(){catalog=await api('/catalog');applyCatalog();}
   function applyCatalog(){renderMenus();const current=$('filter').value;$('filter').replaceChildren(new Option('모든 시대','0'));for(const item of catalog.eras)$('filter').append(new Option(item.name,String(item.id)));$('filter').value=[...$('filter').options].some(item=>item.value===current)?current:'0';}
-  async function openAuth(){
+  async function openAuth(purpose='create'){
+    authPurpose=purpose;const context=quickContext;
     $('auth-error').textContent='';$('password').value='';
     try{
       authState=await api('/status');
-      if(!authState.initialized&&!setupToken){notice('관리자가 아직 초기 설정을 완료하지 않았습니다. 소유자용 설정 링크에서 비밀번호를 먼저 등록해 주세요.');return;}
+      if(purpose==='quick'&&quickContext!==context)return;
+      if(!authState.initialized&&!setupToken){notice('관리자가 아직 초기 설정을 완료하지 않았습니다. 소유자용 설정 링크에서 비밀번호를 먼저 등록해 주세요.');if(purpose==='quick'){quickContext=null;updatePlayControls();}return;}
       $('auth-title').textContent=authState.initialized?'관리자 인증':'최초 관리자 등록';
-      $('auth-help').textContent=authState.initialized?'문제를 만들려면 관리자 비밀번호를 입력하세요.':'입력한 비밀번호가 관리자 비밀번호로 등록됩니다. 8자 이상으로 설정하고 안전하게 보관하세요.';
+      $('auth-help').textContent=authState.initialized?(purpose==='quick'?'방금 푼 문제를 수정하려면 관리자 비밀번호를 입력하세요.':'문제를 만들려면 관리자 비밀번호를 입력하세요.'):'입력한 비밀번호가 관리자 비밀번호로 등록됩니다. 8자 이상으로 설정하고 안전하게 보관하세요.';
       $('auth-submit').textContent=authState.initialized?'접속':'등록하고 접속';$('password').autocomplete=authState.initialized?'current-password':'new-password';$('auth').showModal();$('password').focus();
-    }catch(error){notice(error.message);}
+    }catch(error){notice(error.message);if(purpose==='quick'){quickContext=null;updatePlayControls();}}
   }
   $('create-entry').addEventListener('click',()=>busy($('create-entry'),openAuth));
   async function passwordProof(password,salt){const material=await crypto.subtle.importKey('raw',new TextEncoder().encode(password),'PBKDF2',false,['deriveBits']);const bytes=Uint8Array.from(salt.match(/../g),v=>parseInt(v,16));return [...new Uint8Array(await crypto.subtle.deriveBits({name:'PBKDF2',salt:bytes,iterations:600000,hash:'SHA-256'},material,256))].map(v=>v.toString(16).padStart(2,'0')).join('');}
   $('auth-form').addEventListener('submit',event=>{event.preventDefault();if(composing)return;busy($('auth-submit'),async()=>{
+    const purpose=authPurpose,context=quickContext;
     try{
       const salt=authState.salt||[...crypto.getRandomValues(new Uint8Array(16))].map(v=>v.toString(16).padStart(2,'0')).join('');
       const key=await passwordProof($('password').value,salt);$('password').value='';
-      const result=await api(authState.initialized?'/login':'/setup',{salt,key,...(authState.initialized?{}:{setup_token:setupToken})});token=result.token;setupToken='';$('auth').close();await openGroups('create');
+      const result=await api(authState.initialized?'/login':'/setup',{salt,key,...(authState.initialized?{}:{setup_token:setupToken})});token=result.token;setupToken='';
+      if(purpose==='quick'){if(context&&quickContext===context)await openQuickEditor(context);}
+      else if($('auth').open){$('auth').close();await openGroups('create');}
     }catch(error){if(error.status===409){authState=await api('/status').catch(()=>authState);if(authState.initialized){$('auth-title').textContent='관리자 인증';$('auth-submit').textContent='접속';}}if($('auth').open)$('auth-error').textContent=error.message;else notice(error.message);}
   });});
   $('add-form').addEventListener('submit',event=>{event.preventDefault();if(composing)return;busy($('add-form').querySelector('[type=submit]'),async()=>{try{const result=await api('/categories',{kind:categoryKind,name:$('category-name').value},true);selected[categoryMenu]=result.category.id;const options=categoryKind==='era'?catalog.eras:catalog.types;if(!options.some(item=>item.id===result.category.id))options.push(result.category);options.sort((a,b)=>a.id-b.id);applyCatalog();$('add').close();menus[categoryMenu].trigger.focus();}catch(error){$('add-error').textContent=error.message;}});});
   function cancelEdit(){edit=null;$('create-submit').textContent='생성';$('edit-cancel').hidden=true;$('keyword').value='';resetAnswers();createRequest={signature:'',id:''};}
-  $('edit-cancel').addEventListener('click',cancelEdit);
+  $('edit-cancel').addEventListener('click',()=>{if(quickEditing)$('quick-dialog').close();else cancelEdit();});
   $('create-form').addEventListener('submit',event=>{event.preventDefault();if(composing)return;busy($('create-submit'),async()=>{
     const data={group_id:activeGroup?.id,era_id:selected.era,keyword:$('keyword').value,answers:editorRows.map(row=>({type_id:selected[row.key],answer:row.input.value}))};
     if(!data.era_id||data.answers.some(part=>!part.type_id)){$('save-status').textContent='시대와 정답 종류를 선택해 주세요.';return;}
     const signature=JSON.stringify(data);if(createRequest.signature!==signature)createRequest={signature,id:crypto.randomUUID()};
     const controls=[...$('create-form').querySelectorAll('input,button'),...root.querySelectorAll('.hq-group-switch,.hq-back'),$('logout')].filter(control=>control!==$('create-submit'));
-    controls.forEach(control=>control.disabled=true);$('save-status').textContent='문제를 저장하고 있습니다…';
-    try{await api('/questions',{...data,...(edit?{id:edit.id,revision:edit.revision}:{request_id:createRequest.id})},true);const wasEdit=!!edit;cancelEdit();$('save-status').textContent=wasEdit?'문제를 수정했습니다.':'문제를 저장했습니다. 다음 문제를 입력하세요.';$('keyword').focus();markManageDirty();refreshManageInBackground();}
-    catch(error){$('save-status').textContent=error.message;if(error.status===401)openAuth();}
-    finally{controls.forEach(control=>control.disabled=false);updateEditorLabels();if(!$('keyword').value)$('keyword').focus();}
+    controls.forEach(control=>control.disabled=true);quickSaving=quickEditing;$('save-status').textContent='문제를 저장하고 있습니다…';
+    try{await api('/questions',{...data,...(edit?{id:edit.id,revision:edit.revision}:{request_id:createRequest.id})},true);if(quickEditing){showQuickSaved(data);return;}const wasEdit=!!edit;cancelEdit();$('save-status').textContent=wasEdit?'문제를 수정했습니다.':'문제를 저장했습니다. 다음 문제를 입력하세요.';$('keyword').focus();markManageDirty();refreshManageInBackground();}
+    catch(error){$('save-status').textContent=error.message;if(error.status===401&&!quickEditing)openAuth();}
+    finally{quickSaving=false;controls.forEach(control=>control.disabled=false);updateEditorLabels();if(!$('create').hidden&&!$('keyword').value)$('keyword').focus();}
   });});
+  $('quick-edit').addEventListener('click',()=>{
+    if(!graded||!answered||nextBusy||answerBusy||quickContext||$('play').hidden)return;
+    quickContext={id:question.id,group:activeGroup.id,version:viewVersion};updatePlayControls();openAuth('quick');
+  });
+  async function openQuickEditor(context){
+    const [options,result]=await Promise.all([api('/catalog'),api('/manage?group='+context.group+'&id='+context.id,undefined,true)]);
+    if(quickContext!==context||context.version!==viewVersion)return;
+    catalog=options;applyCatalog();edit=result.question;selected.era=edit.era_id;resetAnswers(edit.answers);$('keyword').value=edit.keyword;
+    $('create-submit').textContent='수정 저장';$('edit-cancel').hidden=false;$('save-status').textContent='';
+    $('quick-body').append($('create-form'));quickEditing=true;authPurpose='create';$('auth').close();$('quick-dialog').showModal();$('keyword').focus();
+  }
+  $('quick-dialog').addEventListener('cancel',event=>{if(quickSaving)event.preventDefault();});
+  $('quick-dialog').addEventListener('close',()=>{
+    $('create').insertBefore($('create-form'),$('manage'));quickEditing=false;quickContext=null;closeMenus();cancelEdit();updatePlayControls();if(!$('next').disabled)$('next').focus({preventScroll:true});
+  });
+  function showQuickSaved(data){
+    question={...question,keyword:normalize(data.keyword),era:catalog.eras.find(item=>item.id===data.era_id)?.name||'',answers:data.answers.map(part=>({type:catalog.types.find(item=>item.id===part.type_id)?.name||'정답',words:normalize(part.answer).split(' ').map(word=>[...word].length)}))};
+    $('clue').textContent=question.keyword;$('play-era').textContent=question.era;showStats({correct:0,wrong:0,rate:null});
+    $('answer-form').classList.remove('is-correct','is-wrong');renderPlayAnswers();playRows.forEach((row,index)=>{row.input.value=normalize(data.answers[index].answer);row.input.readOnly=true;row.feedback.textContent='수정된 정답';slots(row);});
+    $('result').textContent='문제를 수정했습니다. 통계가 초기화되었습니다. Enter로 다음 문제를 이어가세요.';
+    $('quick-dialog').close();markManageDirty();
+  }
   function markManageDirty(){manageDirty=true;manageGeneration++;}
   function refreshManageInBackground(){if($('manage').open)loadManage().catch(()=>{$('manage-status').textContent='목록을 불러오지 못했습니다. 새로고침을 눌러 주세요.';});}
   $('manage').addEventListener('toggle',()=>{if($('manage').open&&manageDirty)refreshManageInBackground();});
@@ -164,15 +192,17 @@
   function tap(){if(!sound)return;try{audio ||= new (window.AudioContext||window.webkitAudioContext)();if(audio.state==='suspended')audio.resume().catch(()=>{});const oscillator=audio.createOscillator(),gain=audio.createGain();oscillator.type='triangle';oscillator.frequency.setValueAtTime(180,audio.currentTime);oscillator.frequency.exponentialRampToValueAtTime(75,audio.currentTime+.035);gain.gain.setValueAtTime(.025,audio.currentTime);gain.gain.exponentialRampToValueAtTime(.001,audio.currentTime+.04);oscillator.connect(gain);gain.connect(audio.destination);oscillator.start();oscillator.stop(audio.currentTime+.045);oscillator.onended=()=>{oscillator.disconnect();gain.disconnect();};}catch{sound=false;soundLabel();}}
   $('sound').addEventListener('click',()=>{sound=!sound;soundLabel();try{localStorage.setItem('orbit-quiz-sound',String(sound));}catch{}if(sound)tap();});soundLabel();
   function updatePlayControls(){
-    const loading=nextBusy||answerBusy,unsolved=!!question&&!answered;
+    const loading=nextBusy||answerBusy||!!quickContext,unsolved=!!question&&!answered;
     $('next').disabled=loading||!question||!answered;
     $('retry').disabled=loading||unsolved;$('filter').disabled=loading||unsolved;
     $('check').disabled=loading||!question||answered;
+    $('quick-edit').hidden=$('play').hidden||!graded||!answered||nextBusy||answerBusy;
+    $('quick-edit').disabled=loading;
   }
   async function next(){
-    if(nextBusy||answerBusy||!activeGroup||(question&&!answered))return;const version=viewVersion;nextBusy=true;updatePlayControls();notice('');
+    if(nextBusy||answerBusy||quickContext||!activeGroup||(question&&!answered))return;const version=viewVersion;nextBusy=true;updatePlayControls();notice('');
     try{
-      const result=await api('/next',{player,group_id:activeGroup.id,era_id:Number($('filter').value),previous:question?.id||null});if(version!==viewVersion)return;question=result.question;attempt=result.attempt;answered=false;
+      const result=await api('/next',{player,group_id:activeGroup.id,era_id:Number($('filter').value),previous:question?.id||null});if(version!==viewVersion)return;question=result.question;attempt=result.attempt;answered=false;graded=false;
       $('empty').hidden=!!question;$('answer-form').hidden=!question;$('priority').textContent=question?(result.priority==='unmastered'?'아직 맞히지 못한 문제 · 우선 출제':'전체 문제 · 랜덤 출제'):'';
       if(!question)return;
       $('play-era').textContent=question.era;$('clue').textContent=question.keyword;showStats(question.stats);
@@ -186,7 +216,7 @@
     const empty=playRows.find(row=>!normalize(row.input.value));if(empty){$('result').textContent='모든 정답 항목을 입력해 주세요.';empty.input.focus();return;}
     const version=viewVersion;answerBusy=true;$('next').disabled=true;$('retry').disabled=true;$('filter').disabled=true;playRows.forEach(row=>row.input.readOnly=true);$('result').textContent='정답을 확인하고 있습니다…';
     try{
-      const result=await api('/answer',{attempt,answers:playRows.map(row=>row.input.value)});if(version!==viewVersion)return;answered=true;
+      const result=await api('/answer',{attempt,answers:playRows.map(row=>row.input.value)});if(version!==viewVersion)return;answered=true;graded=true;
       let matched=0;result.results.forEach((part,index)=>{const row=playRows[index];row.host.classList.add(part.correct?'is-correct':'is-wrong');row.feedback.textContent=part.correct?'정답':'오답';row.input.setAttribute('aria-invalid',String(!part.correct));row.reveal.hidden=part.correct;row.reveal.textContent='정답: '+part.answer;if(part.correct)matched++;});
       $('answer-form').classList.add(result.correct?'is-correct':'is-wrong');$('result').textContent=result.correct?'모두 정답입니다.':`${result.results.length}개 중 ${matched}개 정답 · 이 문제는 오답으로 기록됩니다.`;
       showStats(result.stats);$('check').hidden=true;
@@ -216,7 +246,7 @@
   }
   $('groups-refresh').addEventListener('click',()=>busy($('groups-refresh'),()=>loadGroups().catch(error=>notice(error.message))));
   root.querySelectorAll('.hq-group-switch').forEach(button=>button.addEventListener('click',()=>{
-    if(nextBusy||groupBusy||answerBusy)return;
+    if(nextBusy||groupBusy||answerBusy||quickContext)return;
     if(groupMode==='create'&&($('keyword').value||editorRows.some(row=>row.input.value))&&!window.confirm('그룹을 변경하면 아직 저장하지 않은 입력 내용이 지워집니다. 변경할까요?'))return;
     openGroups(groupMode).catch(error=>notice(error.message));
   }));

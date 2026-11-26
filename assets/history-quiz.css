@@ -116,3 +116,11 @@
 .hq-play-answer.is-wrong .hq-part-feedback { color:#f59f9c; }
 #hq-priority { margin:12px 0 6px; color:#a3e2c3; }
 #hq-progress-note { margin:0 0 20px; }
+.history-quiz .hq-quick-edit { position:fixed; right:max(16px,env(safe-area-inset-right)); bottom:max(16px,env(safe-area-inset-bottom)); z-index:38; padding:9px 13px; border-radius:10px; font-size:11px; color:#bfd4c9; box-shadow:0 5px 20px #0004; }
+body:has(#hq-quick-edit:not([hidden])) .reading-navigation { bottom:calc(64px + env(safe-area-inset-bottom)); }
+.hq-quick-dialog { width:min(760px,calc(100vw - 28px)); max-width:760px; max-height:calc(100dvh - 32px); overflow:auto; overscroll-behavior:contain; }
+.hq-quick-dialog .hq-card { padding:20px 0 0; border:0; box-shadow:none; background:none; }
+.hq-quick-dialog .hq-actions { position:sticky; bottom:0; background:#192220; padding:12px 0; z-index:1; }
+.hq-quick-dialog .hq-options { position:relative; max-height:180px; }
+@media (max-width:600px) { .hq-quick-dialog { padding:18px; } }
+@media print { .hq-quick-edit { display:none!important; } }

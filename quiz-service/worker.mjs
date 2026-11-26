@@ -84,6 +84,15 @@ async function route(request,env,url,access){
   }
   if(path==='/manage'&&method==='GET'){
     const group=Number(url.searchParams.get('group'));if(!validID(group))fail(400,'문제 그룹을 먼저 선택해 주세요.');
+    if(url.searchParams.has('id')){
+      const id=Number(url.searchParams.get('id'));if(!validID(id))fail(400,'문제 번호를 확인해 주세요.');
+      const [rows,types]=await env.DB.batch([
+        stmt(env,'SELECT q.*,e.name AS era,t.name AS type FROM questions q JOIN categories e ON q.era_id=e.id JOIN categories t ON q.type_id=t.id WHERE q.id=? AND q.group_id=? AND q.deleted=0',id,group),
+        stmt(env,"SELECT id,name FROM categories WHERE kind='type'")
+      ]);
+      const row=rows.results[0];if(!row)fail(404,'문제가 삭제되었거나 해당 그룹에 없습니다.');
+      const {answers_json,...fields}=row;return {question:{...fields,answers:namedParts(row,types.results)}};
+    }
     const page=Math.max(1,Number(url.searchParams.get('page')||1));if(!Number.isSafeInteger(page)||page>100000)fail(400,'페이지를 확인해 주세요.');
     const [exists,rows,total,types]=await env.DB.batch([
       stmt(env,'SELECT id FROM question_groups WHERE id=?',group),

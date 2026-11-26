@@ -52,5 +52,11 @@ quiz: true
   <dialog id="hq-auth" class="hq-dialog" aria-labelledby="hq-auth-title"><form id="hq-auth-form"><div class="hq-dialog-top"><h2 id="hq-auth-title">관리자 인증</h2><button type="button" data-close aria-label="닫기">×</button></div><p id="hq-auth-help"></p><label for="hq-password">관리자 비밀번호</label><input id="hq-password" type="password" minlength="8" maxlength="128" required autocomplete="current-password"><p id="hq-auth-error" role="alert"></p><button type="submit" class="hq-primary" id="hq-auth-submit">접속</button></form></dialog>
   <dialog id="hq-add" class="hq-dialog" aria-labelledby="hq-add-title"><form id="hq-add-form"><div class="hq-dialog-top"><h2 id="hq-add-title">항목 추가</h2><button type="button" data-close aria-label="닫기">×</button></div><label for="hq-category-name">항목 이름</label><input id="hq-category-name" maxlength="30" required autocomplete="off"><p id="hq-add-error" role="alert"></p><button type="submit" class="hq-primary">추가</button></form></dialog>
   <dialog id="hq-delete-dialog" class="hq-dialog" aria-labelledby="hq-delete-title"><div class="hq-dialog-top"><h2 id="hq-delete-title">문제 삭제</h2><button type="button" data-close aria-label="닫기">×</button></div><p>이 문제를 풀이 목록에서 숨길까요? 저장된 기록은 서버에 보관됩니다.</p><p id="hq-delete-error" role="alert"></p><button type="button" id="hq-delete-confirm">삭제</button></dialog>
+  <button type="button" id="hq-quick-edit" class="hq-quick-edit" hidden>문제 수정</button>
+  <dialog id="hq-quick-dialog" class="hq-dialog hq-quick-dialog" aria-labelledby="hq-quick-title">
+    <div class="hq-dialog-top"><h2 id="hq-quick-title">문제 수정</h2><button type="button" data-close aria-label="문제 수정 닫기">×</button></div>
+    <p>현재 문제를 바로 수정합니다. 저장하면 이 문제의 정답·오답 통계가 초기화되고 새 버전으로 다시 출제됩니다.</p>
+    <div id="hq-quick-body"></div>
+  </dialog>
   <noscript>퀴즈를 이용하려면 브라우저에서 JavaScript를 허용해 주세요.</noscript>
 </section>
