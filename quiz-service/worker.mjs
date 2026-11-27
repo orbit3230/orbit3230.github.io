@@ -148,11 +148,10 @@ async function route(request,env,url,access){
     const [exists,count,candidates,types]=await env.DB.batch([
       stmt(env,'SELECT id FROM question_groups WHERE id=?',group),
       stmt(env,'SELECT count(*) AS n FROM questions WHERE deleted=0 AND group_id=? AND (?=0 OR era_id=?)',group,era,era),
-      stmt(env,`SELECT q.*,e.name AS era,COALESCE(p.mastered,0) AS mastered FROM questions q
+      stmt(env,`SELECT q.*,e.name AS era FROM questions q
         JOIN categories e ON e.id=q.era_id
-        LEFT JOIN player_progress p ON p.question_id=q.id AND p.revision=q.revision AND p.player_id=?
         WHERE q.deleted=0 AND q.group_id=? AND (?=0 OR q.era_id=?)
-        ORDER BY COALESCE(p.mastered,0), (q.id=?), RANDOM() LIMIT 1`,player,group,era,era,previous),
+        ORDER BY (q.correct>0), (q.id=?), RANDOM() LIMIT 1`,group,era,era,previous),
       stmt(env,"SELECT id,name FROM categories WHERE kind='type'")
     ]);
     if(!exists.results.length)fail(404,'문제 그룹을 찾을 수 없습니다.');
@@ -160,7 +159,7 @@ async function route(request,env,url,access){
     const token=random(),parts=namedParts(q,types.results);
     await run(env,'INSERT INTO attempts(token,question_id,revision,expires,player_id) VALUES(?,?,?,?,?)',await digest(token),q.id,q.revision,now()+86400000,player);
     const answers=parts.map(part=>({type:part.type,words:part.answer.split(' ').map(w=>[...w].length)}));
-    return {question:{id:q.id,era:q.era,type:answers[0].type,keyword:q.keyword,words:answers[0].words,answers,stats:stats(q)},attempt:token,total,priority:player&&!q.mastered?'unmastered':'random'};
+    return {question:{id:q.id,era:q.era,type:answers[0].type,keyword:q.keyword,words:answers[0].words,answers,stats:stats(q)},attempt:token,total,priority:q.correct===0?'unmastered':'random'};
   }
   if(method==='POST'&&path==='/answer'){
     if(!/^[a-f0-9]{64}$/.test(data.attempt||''))fail(400,'답을 확인해 주세요.');

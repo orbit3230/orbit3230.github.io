@@ -36,7 +36,7 @@ quiz: true
     <div class="hq-current-group"><span><small>선택한 그룹</small><strong id="hq-play-group"></strong></span><button type="button" class="hq-group-switch">그룹 변경</button></div>
     <div class="hq-play-filter"><label for="hq-filter">시대 선택</label><select id="hq-filter"><option value="0">모든 시대</option></select><button type="button" id="hq-retry">문제 불러오기</button></div>
     <p id="hq-priority" class="hq-helper" aria-live="polite"></p>
-    <p id="hq-progress-note" class="hq-stat-note">아직 한 번도 맞히지 못한 문제를 먼저 출제합니다. 내 풀이 기록은 같은 브라우저에서 이어집니다.</p>
+    <p id="hq-progress-note" class="hq-stat-note">선택한 그룹·시대에서 전체 방문자의 정답 횟수가 0인 문제를 먼저 출제합니다. 모두 한 번 이상 맞히면 전체에서 랜덤 출제합니다.</p>
     <div id="hq-empty" class="hq-card" hidden><h2>아직 문제가 없습니다.</h2><p>선택한 그룹과 시대에 해당하는 문제가 없습니다. 다른 그룹이나 시대를 선택해 주세요.</p></div>
     <form id="hq-answer-form" class="hq-card hq-play-card" hidden>
       <p id="hq-play-era" class="hq-play-era"></p><h2 id="hq-clue"></h2>
@@ -46,13 +46,13 @@ quiz: true
       <p id="hq-result" role="status" aria-live="polite"></p>
       <div class="hq-actions"><button type="submit" id="hq-check" class="hq-primary">정답 확인</button><button type="button" id="hq-next" disabled>다음 문제 →</button></div>
       <p class="hq-stat-note">전체 방문자의 풀이 횟수입니다. 정답·오답은 제출할 때 한 번 집계됩니다.</p>
+      <div class="hq-card-footer"><button type="button" id="hq-quick-edit" class="hq-quick-edit" hidden>문제 수정</button></div>
     </form>
   </section>
   <dialog id="hq-group-dialog" class="hq-dialog" aria-labelledby="hq-group-title"><form id="hq-group-form"><div class="hq-dialog-top"><h2 id="hq-group-title">문제 그룹 만들기</h2><button type="button" data-close aria-label="닫기">×</button></div><label for="hq-group-name">그룹 이름</label><input id="hq-group-name" maxlength="60" required autocomplete="off" placeholder="예: 한국사 심화 · 조선"><p id="hq-group-error" role="alert"></p><button type="submit" class="hq-primary">만들고 시작</button></form></dialog>
   <dialog id="hq-auth" class="hq-dialog" aria-labelledby="hq-auth-title"><form id="hq-auth-form"><div class="hq-dialog-top"><h2 id="hq-auth-title">관리자 인증</h2><button type="button" data-close aria-label="닫기">×</button></div><p id="hq-auth-help"></p><label for="hq-password">관리자 비밀번호</label><input id="hq-password" type="password" minlength="8" maxlength="128" required autocomplete="current-password"><p id="hq-auth-error" role="alert"></p><button type="submit" class="hq-primary" id="hq-auth-submit">접속</button></form></dialog>
   <dialog id="hq-add" class="hq-dialog" aria-labelledby="hq-add-title"><form id="hq-add-form"><div class="hq-dialog-top"><h2 id="hq-add-title">항목 추가</h2><button type="button" data-close aria-label="닫기">×</button></div><label for="hq-category-name">항목 이름</label><input id="hq-category-name" maxlength="30" required autocomplete="off"><p id="hq-add-error" role="alert"></p><button type="submit" class="hq-primary">추가</button></form></dialog>
   <dialog id="hq-delete-dialog" class="hq-dialog" aria-labelledby="hq-delete-title"><div class="hq-dialog-top"><h2 id="hq-delete-title">문제 삭제</h2><button type="button" data-close aria-label="닫기">×</button></div><p>이 문제를 풀이 목록에서 숨길까요? 저장된 기록은 서버에 보관됩니다.</p><p id="hq-delete-error" role="alert"></p><button type="button" id="hq-delete-confirm">삭제</button></dialog>
-  <button type="button" id="hq-quick-edit" class="hq-quick-edit" hidden>문제 수정</button>
   <dialog id="hq-quick-dialog" class="hq-dialog hq-quick-dialog" aria-labelledby="hq-quick-title">
     <div class="hq-dialog-top"><h2 id="hq-quick-title">문제 수정</h2><button type="button" data-close aria-label="문제 수정 닫기">×</button></div>
     <p>현재 문제를 바로 수정합니다. 저장하면 이 문제의 정답·오답 통계가 초기화되고 새 버전으로 다시 출제됩니다.</p>

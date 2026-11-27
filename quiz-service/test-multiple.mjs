@@ -39,7 +39,7 @@ next=(await api('/next',{group_id:group,player})).data;
 check(next.priority==='random','All mastered falls back to whole-group random');
 await api('/answer',{attempt:next.attempt,answers:['틀림','틀림']});
 check((await api('/next',{group_id:group,player})).data.priority==='random','A later mistake does not erase having answered correctly once');
-check((await api('/next',{group_id:group,player:otherPlayer})).data.priority==='unmastered','Progress isolated per anonymous player');
+check((await api('/next',{group_id:group,player:otherPlayer})).data.priority==='random','Global priority is shared across players');
 const second=(await api('/questions',{...body,request_id:crypto.randomUUID(),keyword:'훈민정음',answers:[{type_id:king,answer:'세종'}]},token)).data.id;
 next=(await api('/next',{group_id:group,player,previous:second})).data;
 check(next.question.id===second&&next.priority==='unmastered','New unmastered question prioritized over mastered question');
